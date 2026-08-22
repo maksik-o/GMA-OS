@@ -13,6 +13,7 @@ import { dbGetKV, dbSetKV } from './db.js';
 import * as hk from './hotkeys.js';
 import { timerInit } from './timer.js';
 import { init as contactsInit, renderContactsView, contactsSubscribe } from './contacts.js';
+import { init as quickNotesInit } from './quicknotes.js';
 
 const $ = id => document.getElementById(id);
 
@@ -563,6 +564,7 @@ function renderCurrent() {
 async function boot() {
   await init();
   await contactsInit();
+  await quickNotesInit();
   await loadModeColors();
   await hk.loadKeys();
   const t = await dbGetKV('theme');

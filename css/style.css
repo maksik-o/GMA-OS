@@ -1573,3 +1573,116 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
 .btn.mini { padding: 4px 10px; font-size: 14px; height: 32px; }
 
 .bottomnav button:active { transform: scale(0.95); }
+
+/* Quick Notes Panel */
+.quick-notes {
+  margin: 16px;
+  border-radius: var(--r-lg);
+  background: color-mix(in srgb, var(--tint, transparent) 4%, var(--glass));
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  backdrop-filter: blur(20px) saturate(1.5);
+  box-shadow: var(--shadow), var(--inner-glow);
+  border: 0;
+  overflow: hidden;
+}
+
+.qn-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--brd);
+}
+
+.qn-title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--dim);
+}
+
+.qn-list {
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 60px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.qn-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--text) 3%, transparent);
+  transition: all var(--dur-hover) var(--ease-spring);
+}
+
+.qn-item:hover {
+  background: color-mix(in srgb, var(--accent) 5%, transparent);
+  transform: translateX(2px);
+}
+
+.qn-text {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--text);
+  overflow-wrap: anywhere;
+  border: 0;
+  background: transparent;
+  outline: none;
+  resize: none;
+  padding: 0;
+  min-height: 20px;
+}
+
+.qn-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.qn-item:hover .qn-actions {
+  opacity: 1;
+}
+
+.qn-del {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 0;
+  background: transparent;
+  color: var(--dim);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+}
+
+.qn-del:hover {
+  background: color-mix(in srgb, var(--c-skipped) 10%, transparent);
+  color: var(--c-skipped);
+}
+
+.icon-btn.mini {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 18px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+}
+
+.qn-empty {
+  text-align: center;
+  color: var(--dim);
+  font-size: 13px;
+  padding: 20px;
+}
