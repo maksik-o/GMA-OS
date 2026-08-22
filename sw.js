@@ -1,8 +1,8 @@
-const CACHE = 'rl-v95';
+const CACHE = 'rl-v96';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './css/style.css', './icons/icon.svg',
   './js/app.js', './js/config.js', './js/db.js', './js/files.js', './js/hotkeys.js',
-  './js/overview.js', './js/search.js', './js/store.js', './js/sync.js', './js/timer.js',
+  './js/search.js', './js/store.js', './js/sync.js', './js/timer.js',
   './js/week.js', './js/sheet.js', './js/contacts.js'
 ];
 self.addEventListener('install', e => {
