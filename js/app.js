@@ -6,7 +6,7 @@ import {
   setModeLabel, resetModeLabel, resetAllModeLabels,
 } from './store.js';
 import { renderAll, shiftWeek, goToday, dayOpen, openDay, closeDay, closeCellMenu } from './week.js';
-import { openSheet, closeSheet, sheetOpen, refreshBackdrop, closeDay as sheetCloseDay } from './sheet.js';
+import { openSheet, closeSheet, sheetOpen, refreshBackdrop } from './sheet.js';
 import { syncInit, syncNow, signedIn, configured, renderSyncPanel } from './sync.js';
 import { searchInit, openSearch, closeSearch, searchOpen } from './search.js';
 import { dbGetKV, dbSetKV } from './db.js';

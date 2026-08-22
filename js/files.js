@@ -7,7 +7,6 @@ export const fmtSize = b => b > 1048576 ? (b / 1048576).toFixed(1) + ' МБ' : M
 
 /* Колбэк прогресса: вызывается из sheet.js */
 let onUploadProgress = null;
-export function setUploadProgressCb(fn){ onUploadProgress = fn; }
 
 export async function attachFile(taskId, file) {
   if (file.size > 5 * 1024 * 1024) throw new Error('Файл больше 5 МБ');
