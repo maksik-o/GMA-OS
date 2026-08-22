@@ -3,7 +3,7 @@ import {
   getTagsDict, getTagColor, addTagsToDict, createTask, updateTask, removeTask, getTask,
   addSubtask, toggleSubtask, delSubtask,
 } from './store.js';
-import { attachFile, openTaskFile, removeTaskFile, fmtSize, setUploadProgressCb } from './files.js';
+import { attachFile, openTaskFile, removeTaskFile, fmtSize } from './files.js';
 import { renderAll } from './week.js';
 
 const $ = id => document.getElementById(id);
