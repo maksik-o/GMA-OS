@@ -1,0 +1,16 @@
+{
+  "id": "running-list",
+  "name": "GMA OS — ежедневник",
+  "short_name": "GMA OS",
+  "description": "Личный планировщик задач на основе недели (Running list)",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
