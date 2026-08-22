@@ -1,7 +1,7 @@
 import { dbGetKV, dbSetKV } from './db.js';
 
-const DEFAULT={ new:'KeyN', search:'Slash', overview:'KeyO', today:'KeyT', weekPrev:'ArrowLeft', weekNext:'ArrowRight', dayPrev:'KeyA', dayNext:'KeyD' };
-const LABELS={ new:'Новая задача', search:'Поиск', overview:'Обзор', today:'Сегодня', weekPrev:'Неделя −', weekNext:'Неделя +', dayPrev:'День −', dayNext:'День +' };
+const DEFAULT={ new:'KeyN', search:'Slash', today:'KeyT', weekPrev:'ArrowLeft', weekNext:'ArrowRight', dayPrev:'KeyA', dayNext:'KeyD' };
+const LABELS={ new:'Новая задача', search:'Поиск', today:'Сегодня', weekPrev:'Неделя −', weekNext:'Неделя +', dayPrev:'День −', dayNext:'День +' };
 let keys={...DEFAULT};
 
 export async function loadKeys(){ const v=await dbGetKV('hotkeys'); keys=Object.assign({},DEFAULT,v||{}); }
