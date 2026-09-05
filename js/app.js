@@ -16,6 +16,7 @@ import { init as contactsInit, renderContactsView, contactsSubscribe } from './c
 import { init as notesInit } from './notes.js';
 import { focusInit } from './focus.js';
 import { widgetsInit, openWidgetsPanel } from './widgets.js';
+import { kanbanInit, toggleKanbanView, kanbanOpen, kanbanForceClose, renderKanban } from './kanban.js';
 
 const $ = id => document.getElementById(id);
 
@@ -523,6 +524,7 @@ function closeDrawer() {
 })();
 
 function setView(v) {
+  if (v === 'contacts' && kanbanOpen()) kanbanForceClose(); // канбан живёт только в неделе
   state.view = v;
   const grid = $('grid');
   const cv = $('contactsView');
@@ -552,6 +554,7 @@ function renderCurrent() {
     const focusPanel = $('focusPanel');
     if (notesPanel) notesPanel.hidden = false;
     if (focusPanel) focusPanel.hidden = false;
+    if (kanbanOpen()) renderKanban(); // доска обновляется вместе с сеткой
   }
   else if (state.view === 'contacts') {
     const cv = $('contactsView');
@@ -609,6 +612,7 @@ async function boot() {
   await notesInit();
   await focusInit();
   widgetsInit();
+  kanbanInit(); // кнопка-переключатель + панель доски + жесты
   await loadModeColors();
   await hk.loadKeys();
   const t = await dbGetKV('theme');
@@ -769,19 +773,22 @@ function placeWeekNav() {
   if (!n.wl) return;
   if (!navHost) navHost = document.querySelector('.wn-center');
   if (!searchHost) searchHost = document.querySelector('.wn-right');
-  const toPanel = !mqMobile.matches && state.view === 'week';
+  const kb = $('kanbanBtn'); // кнопка канбана ходит вместе с поиском
+  const toPanel = !mqMobile.matches && state.view === 'week' && !kanbanOpen();
   if (toPanel) {
     const grid = $('grid');
     const rn = grid && grid.querySelector('.r-nav');
     const rs = grid && grid.querySelector('.r-search');
     if (rn && n.wl.parentNode !== rn) rn.append(n.prev, n.wl, n.next);
     if (rs && n.sb && n.sb.parentNode !== rs) rs.appendChild(n.sb);
+    if (rs && kb && kb.parentNode !== rs) rs.insertBefore(kb, n.sb);
   } else {
     if (navHost && n.wl.parentNode !== navHost) navHost.append(n.prev, n.wl, n.next);
     if (searchHost && n.sb && n.sb.parentNode !== searchHost) {
       if (searchAnchor && searchAnchor.parentNode === searchHost) searchHost.insertBefore(n.sb, searchAnchor);
       else searchHost.appendChild(n.sb);
     }
+    if (searchHost && kb && kb.parentNode !== searchHost) searchHost.insertBefore(kb, n.sb);
   }
 }
 
@@ -803,6 +810,7 @@ function bindKeys() {
     else if (hk.matches(e, 'weekNext')) shiftWeek(1);
     else if (hk.matches(e, 'dayPrev')) { e.preventDefault(); moveDay(-1); }
     else if (hk.matches(e, 'dayNext')) { e.preventDefault(); moveDay(1); }
+    else if (hk.matches(e, 'kanban')) { e.preventDefault(); toggleKanbanView(); }
   });
 }
 
