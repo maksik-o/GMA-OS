@@ -1,14 +1,15 @@
-const CACHE = 'rl-v186';
+const CACHE = 'rl-v187';
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './css/style.css',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-180.png',
   './js/app.js', './js/config.js', './js/db.js', './js/files.js', './js/hotkeys.js',
   './js/search.js', './js/store.js', './js/sync.js', './js/timer.js',
   './js/week.js', './js/sheet.js', './js/notes.js', './js/focus.js',
-  './js/widgets.js', './js/cal.js', './js/contacts.js',
+  './js/widgets.js', './js/cal.js', './js/contacts.js', './js/kanban.js',
   './images/sky.jpg', './images/sunset.jpg', './images/waves.jpg',
   './images/mountains.jpg', './images/winter.jpg'
 ];
+
 self.addEventListener('install', e => {
   e.waitUntil((async () => {
     const c = await caches.open(CACHE);
@@ -16,6 +17,7 @@ self.addEventListener('install', e => {
     self.skipWaiting();
   })());
 });
+
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
     const ks = await caches.keys();
@@ -23,6 +25,7 @@ self.addEventListener('activate', e => {
     await self.clients.claim();
   })());
 });
+
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return;
