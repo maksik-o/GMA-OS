@@ -2353,3 +2353,6 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
   .kb-col { flex: 0 0 82%; max-width: none; }
   .kb-periods { margin-left: 0; }
 }
+/* ── Канбан: кнопка и меню видов ── */
+@media (max-width: 720px) { #kanbanBtn { display: none; } }
+#viewMenu { z-index: 60; }
