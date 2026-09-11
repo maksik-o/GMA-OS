@@ -285,7 +285,7 @@ function renderCenter() {
     center.innerHTML = `<div class="fp-caption">Фокусировка</div><button type="button" class="fp-play" title="Запустить фокус"><svg viewBox="0 0 24 24"><path d="M8 5l12 7-12 7z"/></svg></button>`;
     center.querySelector('.fp-play').onclick = enterChoosing;
   } else if (_centerMode === 'choose') {
-    center.innerHTML = `<div class="fp-choose">Фокусировка на:<br><span class="blink">Выберите задачу</span></div>
+    center.innerHTML = `<div class="fp-choose">Фокусировка на: <br><span class="blink">Выберите задачу</span></div>
 <button type="button" class="fp-notask chip">Без задачи</button>`;
     center.querySelector('.fp-notask').onclick = startWithoutTask;
   } else {
@@ -348,6 +348,7 @@ const fmtMMSS = ms => {
   const s = totalSec % 60;
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 };
+
 export function focusInit() {
   renderFocusPanel();
   document.addEventListener('timer-changed', updateFocusUI);
