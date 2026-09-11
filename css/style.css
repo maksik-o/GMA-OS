@@ -2905,3 +2905,6 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
     white-space: nowrap;
   }
 }
+/* ── Автоскрытие нижней навигации при скролле ── */
+.bottomnav { transition: transform .25s var(--ease-spring), opacity .2s ease; }
+.bottomnav.hid { transform: translate(-50%, 90px); opacity: 0; pointer-events: none; }
