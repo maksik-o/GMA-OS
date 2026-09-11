@@ -1,7 +1,7 @@
 /* Service Worker GMA OS.
    ВАЖНО: при каждом релизе поднимай CACHE_VERSION на единицу —
    иначе пользователи останутся на старых файлах из кэша. */
-const CACHE_VERSION = 'rl-v231';
+const CACHE_VERSION = 'rl-v232';
 const CACHE = CACHE_VERSION;
 
 const SHELL = [
