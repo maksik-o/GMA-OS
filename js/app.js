@@ -184,8 +184,7 @@ async function setBgOpacity(val) {
   if (label) label.textContent = Math.round(storedBgOpacity * 100) + '%';
 }
 
-/* ── Панель оформления: не перестраиваем скрытую, защита от повторного входа,
-кружки тем красим шорткатом background (цвет И градиент), обои — слоем сверху ── */
+/* ── Панель оформления: не перестраиваем скрытую, защита от повторного входа ── */
 let _lookBusy = false;
 function renderLookPanel() {
   const dt = $('drawerTheme');
@@ -201,8 +200,6 @@ function renderLookPanel() {
         b.type = 'button';
         b.className = 'theme-dot' + (t.id === storedTheme ? ' on' : '');
         b.title = t.label;
-        /* шорткат принимает и hex, и linear-gradient; обои кладём слоем поверх —
-           без preload-обмена, поэтому кружки не мигают */
         b.style.background = t.bg;
         if (t.img) {
           b.style.backgroundImage = `url(${t.img})`;
@@ -556,10 +553,8 @@ function setView(v) {
   const topbar = document.querySelector('.topbar');
   if (grid) grid.hidden = v !== 'week';
   if (cv) cv.hidden = v !== 'contacts';
-  // Скрываем панели заметок и фокусировки в режиме контактов
   if (notesPanel) notesPanel.hidden = v === 'contacts';
   if (focusPanel) focusPanel.hidden = v === 'contacts';
-  // Переключаем класс на topbar для скрытия кнопок шапки
   if (topbar) topbar.classList.toggle('contacts-active', v === 'contacts');
   document.querySelectorAll('#bottomNav button').forEach(b => b.classList.toggle('on', b.dataset.view === v));
   const ct = $('ctBtn');
@@ -572,7 +567,6 @@ function setView(v) {
 function renderCurrent() {
   if (state.view === 'week') {
     renderAll();
-    // Показываем панели в режиме недели
     const notesPanel = $('notesPanel');
     const focusPanel = $('focusPanel');
     if (notesPanel) notesPanel.hidden = false;
@@ -580,7 +574,6 @@ function renderCurrent() {
     if (kanbanOpen()) renderKanban(); // доска обновляется вместе с сеткой
   } else if (state.view === 'contacts') {
     const cv = $('contactsView');
-    // Скрываем панели в режиме контактов
     const notesPanel = $('notesPanel');
     const focusPanel = $('focusPanel');
     if (notesPanel) notesPanel.hidden = true;
@@ -775,8 +768,7 @@ function bindNavHide() {
   }, { passive: true });
 }
 
-/* ── ПК: блок недели и поиск в шапке задач; мобилка — топбар.
-Троеточие меню — ПЕРЕД заголовком панели (14px до заголовка). ── */
+/* ── ПК: блок недели и поиск в шапке задач; мобилка — топбар. ── */
 const mqMobile = matchMedia('(max-width: 720px)');
 let navHost = null, searchHost = null, searchAnchor = null;
 let navNodes = null;
@@ -791,11 +783,6 @@ function getNavNodes() {
   }
   return navNodes;
 }
-/* Троеточие-меню: ПК-неделя — перед «Running-list», ПК-канбан — перед
-«Kanban-доска», мобилка-неделя — перед заголовком липкой шапки (ставит
-week.js), мобилка-канбан — перед заголовком доски (ставит kanban.js).
-Если целевой заголовок ещё не построен — НЕ утаскиваем кнопку в топбар:
-её доставит ближайший grid-rendered / renderKanban / adjustMobileHead. */
 function placeViewBtn() {
   const vb = $('viewBtn');
   if (!vb) return;
@@ -845,7 +832,17 @@ function placeWeekNav() {
     if (kr && n.sb && n.sb.parentNode !== kr) kr.appendChild(n.sb);
     if (navHost && n.wl.parentNode !== navHost) navHost.append(n.prev, n.wl, n.next);
   } else {
-    if (navHost && n.wl.parentNode !== navHost) navHost.append(n.prev, n.wl, n.next);
+    /* МОБИЛКА-НЕДЕЛЯ: селектор недели ставим СРАЗУ в липкую шапку недели
+       (.m-head-nav). Раньше он сначала падал в топбар (.wn-center) и только
+       потом переезжал — отсюда мигание расширенной шапки на iPhone. */
+    const mobileWeek = mqMobile.matches && state.view === 'week' && !kbOpen;
+    const grid = $('grid');
+    const mn = mobileWeek && grid ? grid.querySelector('.m-head-nav') : null;
+    if (mn) {
+      if (n.wl.parentNode !== mn) mn.append(n.prev, n.wl, n.next);
+    } else if (navHost && n.wl.parentNode !== navHost) {
+      navHost.append(n.prev, n.wl, n.next);
+    }
     if (searchHost && n.sb && n.sb.parentNode !== searchHost) {
       if (searchAnchor && searchAnchor.parentNode === searchHost) searchHost.insertBefore(n.sb, searchAnchor);
       else searchHost.appendChild(n.sb);
