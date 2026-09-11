@@ -31,11 +31,13 @@ export function blockEnd(t) {
   const tot = h * 60 + mi + (t.blockMin || 30);
   return `${String(Math.floor(tot / 60) % 24).padStart(2, '0')}:${String(tot % 60).padStart(2, '0')}`;
 }
+
 export const state = {
   mode: 'work', weekStart: mondayOf(today()), day: today(),
   tasks: [], view: 'week', widgets: ['notes', 'focus'],
   hideDone: false, // скрывать выполненные задачи в списках (неделя/день)
 };
+
 const listeners = [];
 export const subscribe = fn => listeners.push(fn);
 let pendingNotify = false;
@@ -48,14 +50,16 @@ const notify = () => {
   });
 };
 const userChange = () => document.dispatchEvent(new CustomEvent('user-change'));
-export function haptic(pattern = 8) {
+
+/* ── Виброотклик ── */
+function haptic(pattern = 8) {
   try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
 }
 export const hapticLight = () => haptic(6);
-export const hapticMedium = () => haptic(12);
-export const hapticHeavy = () => haptic([15, 30, 15]);
-export const hapticSuccess = () => haptic([8, 40, 8]);
+const hapticMedium = () => haptic(12);
+const hapticSuccess = () => haptic([8, 40, 8]);
 
+/* ── Tombstones: история удалений для синхронизации ── */
 const TOMBSTONES_KEY = 'rl_tombstones';
 const TOMBSTONE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 let tombstones = [];
@@ -77,15 +81,14 @@ function pruneTombstones() {
   tombstones = tombstones.filter(t => t.deletedAt && t.deletedAt >= cutoff);
   if (tombstones.length !== before) saveTombstones();
 }
-export function getTombstones() { return tombstones.map(t => t.id); }
 export function getTombstonesFull() { return tombstones.slice(); }
-export function addTombstone(id) {
+function addTombstone(id) {
   if (!id) return;
   if (tombstones.some(t => t.id === id)) return;
   tombstones.push({ id, deletedAt: Date.now() });
   saveTombstones();
 }
-export function mergeTombstones(server) {
+function mergeTombstones(server) {
   const arr = Array.isArray(server) ? server : [];
   const map = new Map();
   for (const t of tombstones) if (t && t.id) map.set(t.id, t);
@@ -97,17 +100,10 @@ export function mergeTombstones(server) {
   tombstones = [...map.values()];
   pruneTombstones();
 }
-export function isTombstoned(id) { return tombstones.some(t => t.id === id); }
-export function removeTombstone(id) {
+function removeTombstone(id) {
   const before = tombstones.length;
   tombstones = tombstones.filter(t => t.id !== id);
   if (tombstones.length !== before) saveTombstones();
-}
-export function clearTombstones(ids) {
-  if (!ids || !ids.length) return;
-  const set = new Set(ids);
-  tombstones = tombstones.filter(t => !set.has(t.id));
-  saveTombstones();
 }
 loadTombstones();
 
@@ -161,6 +157,7 @@ export async function resetAllModeLabels() {
   document.dispatchEvent(new CustomEvent('mode-labels-changed'));
 }
 
+/* ── Миграция старой схемы задачи ── */
 function migrate(t) {
   if (!t || typeof t !== 'object') return null;
   if (!t.id) return null;
@@ -179,6 +176,7 @@ function migrate(t) {
   if (!t.updatedAt) t.updatedAt = t.createdAt;
   return t;
 }
+
 export async function init() {
   state.tasks = (await dbAll('tasks')).map(migrate).filter(Boolean);
   await loadTagsDict();
@@ -211,6 +209,7 @@ export async function setHideDone(v) {
 
 export const uid = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
 export const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
 export function isDone(t) {
   const vals = Object.values(t.days || {});
   if (!vals.length) return false;
@@ -218,7 +217,7 @@ export function isDone(t) {
   return vals.some(s => s === 'done' || s === 'skipped');
 }
 export const visibleTasks = () => state.tasks.filter(t => !t.deleted && (state.mode === 'all' || t.mode === state.mode));
-export const sortTasks = arr => arr.slice().sort((a, b) => {
+const sortTasks = arr => arr.slice().sort((a, b) => {
   const da = isDone(a), db2 = isDone(b);
   if (da !== db2) return da ? 1 : -1;
   if (da && db2) return completionDay(a).localeCompare(completionDay(b));
@@ -248,6 +247,7 @@ export function weekRows(ws) {
   return sortTasks(list);
 }
 export const getTask = id => state.tasks.find(t => t.id === id);
+
 export async function createTask(data) {
   const now = new Date().toISOString();
   const t = {
@@ -314,9 +314,12 @@ export async function postponeFrom(id, day) {
   userChange();
   hapticLight();
 }
+
+/* ── Слияние с сервером (sync) ── */
 export async function applyMerged(payload) {
-  const remoteTasks = Array.isArray(payload && payload.tasks) ? payload.tasks : [];
-  const remoteTombstones = Array.isArray(payload && payload.tombstones) ? payload.tombstones : [];
+  const p = payload || {};
+  const remoteTasks = Array.isArray(p.tasks) ? p.tasks : [];
+  const remoteTombstones = Array.isArray(p.tombstones) ? p.tombstones : [];
   mergeTombstones(remoteTombstones);
   const tombSet = new Set(tombstones.map(t => t.id));
   if (remoteTasks.length === 0 && remoteTombstones.length === 0 && state.tasks.length > 0) {
@@ -341,6 +344,7 @@ export async function applyMerged(payload) {
   catch (err) { console.error('[store] dbBulk failed:', err); }
   notify();
 }
+
 export async function setMode(m) {
   state.mode = m;
   await dbSetKV('mode', m);
@@ -348,6 +352,8 @@ export async function setMode(m) {
   userChange();
   hapticLight();
 }
+
+/* ── Подзадачи ── */
 export async function addSubtask(id, text) {
   const t = getTask(id);
   if (!t) return;
@@ -372,9 +378,11 @@ export async function updateSubtask(id, sid, patch) {
   Object.assign(s, patch);
   await updateTask(id, { subtasks: t.subtasks });
 }
-/* ── Полуночный авто-перенос: «Запланировано» вчера → «Перенесено», сегодня → «Запланировано» ── */
+
+/* ── Полуночный авто-перенос: «Запланировано» вчера → «Перенесено», сегодня → «Запланировано».
+   Пишем одной транзакцией dbBulk вместо N вызовов dbPut. ── */
 let _lastToday = today();
-export function checkDayRollover() {
+export async function checkDayRollover() {
   const t0 = today();
   if (t0 === _lastToday) return;
   const old = _lastToday;
@@ -387,13 +395,18 @@ export function checkDayRollover() {
       if (!d[t0]) d[t0] = 'todo';
       t.doneAt = null;
       t.updatedAt = new Date().toISOString();
-      dbPut('tasks', t);
       changed = true;
     }
   }
-  if (changed) { notify(); userChange(); }
+  if (changed) {
+    try { await dbBulk('tasks', state.tasks); }
+    catch (e) { console.error('[store] rollover dbBulk failed:', e); }
+    notify();
+    userChange();
+  }
 }
 
+/* ── Цвета режимов ── */
 const DEFAULT_MODE_COLORS = { work: '#dc2626', home: '#16a34a', study: '#2563eb', all: '#d4a017' };
 let modeColors = { ...DEFAULT_MODE_COLORS };
 export const getModeColors = () => ({ ...modeColors });
@@ -423,6 +436,7 @@ function applyModeColorsToCSS() {
   r.style.setProperty('--mode-all', modeColors.all);
 }
 
+/* ── Словарь тегов ── */
 const normTag = t => (typeof t === 'string' ? { name: t, color: null } : { name: String((t && t.name) || ''), color: (t && t.color) || null });
 let tagsCache = [];
 let tagsDeletedCache = [];
