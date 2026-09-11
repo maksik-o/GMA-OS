@@ -1,4 +1,9 @@
-const CACHE = 'rl-v229';
+/* Service Worker GMA OS.
+   ВАЖНО: при каждом релизе поднимай CACHE_VERSION на единицу —
+   иначе пользователи останутся на старых файлах из кэша. */
+const CACHE_VERSION = 'rl-v230';
+const CACHE = CACHE_VERSION;
+
 const SHELL = [
   './', './index.html', './manifest.webmanifest', './css/style.css',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-180.png',
@@ -24,6 +29,11 @@ self.addEventListener('activate', e => {
     await Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)));
     await self.clients.claim();
   })());
+});
+
+/* Клиент может попросить немедленно активировать новый SW */
+self.addEventListener('message', e => {
+  if (e.data === 'skipWaiting') self.skipWaiting();
 });
 
 self.addEventListener('fetch', e => {
