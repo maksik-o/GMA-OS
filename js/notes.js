@@ -26,7 +26,9 @@ const notify = () => {
   }, 100);
 };
 const userChange = () => document.dispatchEvent(new CustomEvent('user-change'));
-const cap = s => (s ? s.charAt(0).toUpperCase() : s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+/* БЫЛО: cap возвращала только первую букву («Сентября» → «С»).
+   ТЕПЕРЬ: первая заглавная + остальное слово. */
+const cap = s => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 /* ── Prune: удалённые заметки старше 30 дней вычищаются ── */
 const NOTE_PRUNE_MS = 30 * 24 * 60 * 60 * 1000;
@@ -139,12 +141,6 @@ function autoGrow(instant) {
     return;
   }
   requestAnimationFrame(() => { c.style.height = target + 'px'; });
-}
-
-/* ── Пустое поле: класс is-empty управляет разлиновкой из CSS ── */
-function syncEmptyClass() {
-  if (!_editorEl) return;
-  _editorEl.classList.toggle('is-empty', !_editorEl.textContent.trim());
 }
 
 /* ── Первая строка = заголовок: держим класс nn-h на первом блоке ── */
@@ -312,7 +308,6 @@ export function renderNotesPanel(container) {
 <div class="notes-editor" contenteditable="true">${_currentNote ? _currentNote.html : ''}</div>`;
   _editorEl = container.querySelector('.notes-editor');
   ensureHeadLine();
-  syncEmptyClass();
   bindNotesEvents(container);
   autoGrow(true);
 }
@@ -381,7 +376,6 @@ function bindNotesEvents(container) {
       await deleteNote(_currentNote.id);
       if (_editorEl) _editorEl.innerHTML = '';
       container.classList.remove('editing');
-      syncEmptyClass();
       autoGrow(false);
     }
   };
@@ -390,10 +384,9 @@ function bindNotesEvents(container) {
     _selBound = true;
     document.addEventListener('selectionchange', positionToolbar);
   }
-  /* Ввод: заголовок-первая строка + автосохранение + рост + разлиновка */
+  /* Ввод: заголовок-первая строка + автосохранение + рост */
   _editorEl.addEventListener('input', () => {
     ensureHeadLine();
-    syncEmptyClass();
     scheduleSave();
     autoGrow(false);
   });
