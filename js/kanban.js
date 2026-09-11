@@ -11,7 +11,7 @@
    (стрелки + текст-селектор); надпись недели сокращается по тем же
    правилам, что и в Running-list.
    Настройки вида храним локально (localStorage).
-============================================================ */
+   ============================================================ */
 import {
   state, visibleTasks, isDone, getTask, getTagsDict, getTagColor, addTagsToDict,
   updateTask, setEntry, subscribe, MODES, setHideDone,
@@ -43,7 +43,6 @@ let animBusy = false;
 let boardBusy = false;
 let modeAnimBusy = false;
 let exitAnims = [];
-
 export const kanbanOpen = () => isOpen;
 
 /* ── Диапазон ── */
@@ -242,13 +241,16 @@ async function switchBoard(v) {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!panel || reduce) { kb.view = v; saveKb(); renderKanban(); return; }
   boardBusy = true;
-  hapticLight();
-  const prevRects = new Map([...panel.querySelectorAll('.kb-col')].map(c => [c.dataset.value, c.getBoundingClientRect()]));
-  kb.view = v;
-  saveKb();
-  renderKanban();
-  animateBoardFlip(prevRects, panel);
-  boardBusy = false;
+  try {
+    hapticLight();
+    const prevRects = new Map([...panel.querySelectorAll('.kb-col')].map(c => [c.dataset.value, c.getBoundingClientRect()]));
+    kb.view = v;
+    saveKb();
+    renderKanban();
+    animateBoardFlip(prevRects, panel);
+  } finally {
+    boardBusy = false;
+  }
 }
 
 /* ── Смена РЕЖИМА работы в канбане ── */
