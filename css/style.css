@@ -1,3 +1,9 @@
+/* ============================================================
+   GMA OS — style.css
+   Вычищенная сборка: дубли слиты, битые селекторы и комментарии
+   починены, база .bottomnav перенесена ВЫШЕ мобильной медиа-секции.
+   ============================================================ */
+
 *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
 input, textarea, [contenteditable="true"] { user-select: text; -webkit-user-select: text; }
 [hidden] { display: none !important; }
@@ -62,6 +68,7 @@ html, body,
 :root[data-mode="home"]  { --accent: var(--mode-home); }
 :root[data-mode="study"] { --accent: var(--mode-study); }
 :root[data-mode="all"]   { --accent: var(--mode-all); }
+
 /* ── Поверхности: финальные значения (прозрачность управляется --panel-a) ── */
 body[data-surf="light"] {
   --text:#0f172a;
@@ -126,6 +133,7 @@ body[data-font="l"] { zoom: 1.1; }
   -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
   padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
 }
+
 /* ── GLASS: блюр привязан к ползунку панелей ── */
 .glass {
   position: relative;
@@ -135,11 +143,12 @@ body[data-font="l"] { zoom: 1.1; }
   box-shadow: var(--shadow), var(--inner-glow);
 }
 .glass:hover { box-shadow: var(--shadow), var(--inner-glow); }
+
 /* ── Шапка ── */
 .topbar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--r-lg); margin-bottom: 12px; min-width: 0; }
 .topbar.contacts-active .modes, .topbar.contacts-active .wn-center { display: none; }
 .topbar.contacts-active .wn-right { display: flex; }
-.topbar.contacts-active .wn-right > *:not(#ctBtn) { display: none; }
+.topbar.contacts-active .wn-right > :not(#ctBtn) { display: none; }
 .topbar.contacts-active::before {
   content: 'Контакты';
   grid-column: 1;
@@ -164,6 +173,7 @@ body[data-font="l"] { zoom: 1.1; }
   overflow: hidden;
   min-width: 0;
 }
+/* Блоб: цвет красится из JS покадрово, transition на background не нужен */
 .mode-blob {
   position: absolute;
   top: 4px;
@@ -177,7 +187,6 @@ body[data-font="l"] { zoom: 1.1; }
   transition:
     left 700ms var(--ease-bounce),
     width 700ms var(--ease-bounce),
-    background var(--dur-mode) var(--ease-mode),
     box-shadow var(--dur-mode) var(--ease-mode),
     opacity 300ms ease;
 }
@@ -260,6 +269,7 @@ body[data-font="l"] { zoom: 1.1; }
 .sync[data-state="error"] .dot { background: var(--c-skipped); }
 .sync[data-state="auth"] .dot { background: var(--p2); }
 @keyframes pulse { 50% { opacity: .35; } }
+
 /* ── Сетка недели ── */
 .week2 { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start; }
 .pane { border-radius: var(--r-lg); padding: 10px; min-width: 0; position: relative; }
@@ -297,7 +307,8 @@ body[data-font="l"] { zoom: 1.1; }
     background-color: color-mix(in srgb, var(--rowc, var(--accent)) 16%, transparent);
   }
 }
-/* ── Липкая шапка дней: финальное состояние после всех раундов ── */
+
+/* ── Липкая шапка дней ── */
 .l-head, .m-head {
   position: sticky;
   top: var(--stick-top, 0px);
@@ -370,6 +381,7 @@ body[data-surf="dark"] .l-head, body[data-surf="dark"] .m-head {
 .add-sub { flex: none; width: 30px; height: 30px; border-radius: 50%; border: 0; color: var(--c-done); background: color-mix(in srgb, var(--c-done) 15%, transparent); font-size: 15px; font-weight: 800; display: grid; place-items: center; }
 .note-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--c-done); }
 .r-row.st-done .g-title, .r-row.st-skipped .g-title { text-decoration: line-through; opacity: .55; }
+
 /* ── CELL: границы только для семантики статусов ── */
 .cell {
   width: 30px; height: 28px;
@@ -457,6 +469,7 @@ body[data-surf="dark"] .l-head, body[data-surf="dark"] .m-head {
 .tag-pill:hover { transform: scale(1.06); }
 .tag-more { color: var(--dim); font-weight: 700; font-size: 10.5px; }
 .p-mobile { display: none; }
+
 /* ── Поиск ── */
 .searchpanel {
   position: fixed;
@@ -509,6 +522,7 @@ body[data-surf="dark"] .l-head, body[data-surf="dark"] .m-head {
 .s-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .s-title { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .s-meta { color: var(--dim); font-size: 11px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+
 /* ── Шторка настроек ── */
 .drawer {
   position: fixed;
@@ -604,6 +618,7 @@ body[data-surf="dark"] .l-head, body[data-surf="dark"] .m-head {
   margin-left: 5px; margin-right: 5px;
   box-shadow: 0 1px 3px color-mix(in srgb, var(--text) 15%, transparent);
 }
+
 /* ── Auth ── */
 .auth {
   position: fixed;
@@ -638,6 +653,7 @@ body[data-surf="dark"] .l-head, body[data-surf="dark"] .m-head {
 }
 .key-input:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent); }
 .set-sub { font-size: 11.5px; color: var(--dim); margin: 16px 0 10px; text-transform: uppercase; letter-spacing: .07em; font-weight: 700; }
+
 /* ── Темы/фоны/шрифты в оформлении ── */
 .theme-row { display: flex; gap: 10px; justify-content: flex-start; flex-wrap: wrap; }
 .theme-dot {
@@ -734,6 +750,7 @@ input[type="color"]:hover { transform: scale(1.05); }
   box-shadow: 0 2px 6px rgba(0,0,0,.2);
 }
 .bg-opacity-label { font-size: 12px; font-weight: 600; color: var(--dim); min-width: 40px; }
+
 /* ── Настройки режимов ── */
 .mode-settings-list { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
 .mode-setting-row {
@@ -793,6 +810,7 @@ input[type="color"]:hover { transform: scale(1.05); }
   background: color-mix(in srgb, var(--text) 8%, transparent);
   color: var(--text);
 }
+
 /* ── Теги ── */
 .tags-list { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; text-align: left; }
 .tag-line {
@@ -876,6 +894,7 @@ input[type="color"]:hover { transform: scale(1.05); }
 .tc-dot.on { box-shadow: 0 0 0 2px var(--text); }
 .tc-input { width: 30px; height: 26px; border: 0; border-radius: 6px; background: var(--card); padding: 2px; cursor: pointer; }
 .tc-label { font-size: 12px; color: var(--dim); }
+
 /* ── Горячие клавиши ── */
 #keysRows { margin-bottom: 4px; }
 #keysRows .btn {
@@ -911,6 +930,7 @@ input[type="color"]:hover { transform: scale(1.05); }
   animation: pulse 1s infinite;
   background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
+
 /* ── Задачи / панель дня ── */
 .tasks { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .daypanel { width: min(720px, calc(100vw - 24px)); text-align: left; }
@@ -971,12 +991,14 @@ input[type="color"]:hover { transform: scale(1.05); }
 .t-title { font-weight: 600; overflow-wrap: anywhere; }
 .t-meta { color: var(--dim); font-size: 12px; margin-top: 1px; }
 .m-time { color: var(--c-time); font-weight: 700; }
+
 /* ── Свайпы ── */
 .swipe-hint { position: absolute; inset: 0; z-index: 3; display: flex; align-items: center; padding: 0 14px; border: 0; border-radius: inherit; color: #fff; font-size: 13px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; opacity: 0; pointer-events: none; transition: opacity .12s; }
 .hint-done { justify-content: flex-start; background: var(--c-done); }
 .hint-move { justify-content: flex-end; background: var(--c-postponed); }
 .to-done > .hint-done, .rev-done > .hint-done, .to-move > .hint-move, .rev-move > .hint-move { opacity: .97; pointer-events: auto; }
 .task.swiping, .r-row.swiping { transition: none; animation: none; }
+
 /* ── Контекстное меню статусов ── */
 .cmenu {
   position: fixed;
@@ -1009,6 +1031,11 @@ input[type="color"]:hover { transform: scale(1.05); }
 .cmenu button:active { transform: scale(.98); }
 .cmenu button.on { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
 .cmenu svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; flex: none; }
+/* Меню-селекторы: концентричные скругления (внешнее = пункт + отступ) */
+.cmenu { border-radius: 14px; padding: 4px; }
+.cmenu button { border-radius: 10px; }
+.cmenu .cm-ico { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; font-size: 16px; line-height: 1; }
+
 /* ── Таймер: пилюля ── */
 .timer {
   flex: none;
@@ -1103,7 +1130,8 @@ input[type="color"]:hover { transform: scale(1.05); }
 @media (max-width: 720px) {
   .timer-fab { right: calc(max(14px, env(safe-area-inset-right)) + 2px); bottom: calc(70px + env(safe-area-inset-bottom)); width: 44px; height: 44px; }
 }
-/* ── FAB ─ */
+
+/* ── FAB ── */
 .fab {
   position: fixed;
   right: max(16px, env(safe-area-inset-right));
@@ -1134,6 +1162,7 @@ input[type="color"]:hover { transform: scale(1.05); }
 .fab svg { width: 24px; height: 24px; fill: currentColor; }
 .backdrop { position: fixed; inset: 0; background: rgba(2, 8, 23, .3); z-index: 29; opacity: 0; pointer-events: none; transition: opacity .35s; }
 .backdrop.open { opacity: 1; pointer-events: auto; }
+
 /* ── Шторка задачи ── */
 .sheet {
   position: fixed;
@@ -1272,6 +1301,7 @@ input.chip.time {
   -webkit-user-select: text;
 }
 input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 40%, transparent); }
+
 /* ── Редактор задачи ── */
 .editor {
   position: fixed;
@@ -1383,10 +1413,12 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
 }
 .btn.danger { color: var(--c-skipped); background: color-mix(in srgb, var(--c-skipped) 8%, transparent); border: 0; }
 .btn.danger:hover { background: color-mix(in srgb, var(--c-skipped) 14%, transparent); }
-.btn.mini { padding: 4px 10px; font-size: 14px; height: 32px; }
+.btn.mini { padding: 4px 10px; font-size: 14px; height: 32px; min-width: 44px; }
+
 /* ── Pull-to-refresh ── */
 .pull-ind { position: fixed; left: 50%; top: 8px; transform: translate(-50%, -20px); z-index: 50; opacity: 0; pointer-events: none; transition: opacity .15s, transform .2s; }
 .pull-ind.show { opacity: 1; transform: translate(-50%, 0); }
+
 /* ── Контакты ── */
 .contacts-view { padding: 16px 8px; display: flex; flex-direction: column; gap: 14px; min-height: 60vh; overflow-y: auto; }
 .contacts-view[hidden] { display: none !important; }
@@ -1510,6 +1542,7 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
 .person-editor .ed-card .f-title + .f-title { margin-top: 4px; }
 .person-editor .chip-row { margin: 4px 0; }
 .person-editor .ed-actions { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--brd); }
+
 /* ── Панель заметок ── */
 .notes-panel {
   position: relative;
@@ -1517,10 +1550,11 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  min-height: 200px;
+  min-height: var(--focus-size);
   overflow: visible;
   min-width: 0;
   width: auto;
+  transition: height .3s var(--ease-spring);
 }
 .notes-panel.resizing { transition: none; }
 .notes-header { display: flex; align-items: center; gap: 10px; padding: 2px 0 8px 0; border-bottom: 1px solid var(--brd); margin-bottom: 6px; }
@@ -1532,7 +1566,7 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .notes-day-label .nd-num { color: var(--accent); }
-.notes-day-label .nd-today { font-style: normal; font-size: 17px; font-weight: 700; color: var(--text); }
+.notes-day-label .nd-today { font-style: normal; font-size: 17px; font-weight: 700; color: var(--text); margin-left: 7px; }
 .notes-actions { display: flex; gap: 6px; }
 .notes-actions .icon-btn { font-size: 16px; }
 .notes-actions .icon-btn.on { background: var(--accent-deep); color: #fff; }
@@ -1541,11 +1575,12 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
   font: inherit; font-size: 17px; font-weight: 800; color: var(--text);
   padding: 2px 0 6px;
   user-select: text; -webkit-user-select: text;
+  display: none;
 }
 .note-title::placeholder { color: var(--dim); font-weight: 600; font-size: 13px; }
 .notes-editor {
   flex: 1;
-  min-height: 100px;
+  min-height: 24px;
   padding: 12px;
   border-radius: 12px;
   background: var(--card);
@@ -1557,12 +1592,8 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
   -webkit-user-select: text;
   cursor: text;
 }
-.notes-editor:empty::before {
-  content: attr(data-placeholder);
-  color: var(--dim);
-  pointer-events: none;
-  font-size: 13px;
-}
+.notes-editor:empty::before { content: none; }
+.notes-editor .nn-h { font-size: 17px; font-weight: 800; }
 .notes-editor:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent); }
 .notes-resize-handle {
   position: absolute;
@@ -1587,9 +1618,16 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
   transition: background .2s;
 }
 .notes-resize-handle:hover::before { background: var(--accent); }
-/* Тулбар заметок поверх редактора */
+/* Тулбар заметок НАД выделением */
 .notes-toolbar {
-  position: absolute; left: 10px; right: 10px; bottom: 16px; top: auto; z-index: 7;
+  position: absolute;
+  left: 0;
+  right: auto;
+  bottom: auto;
+  top: 0;
+  width: max-content;
+  max-width: calc(100% - 16px);
+  z-index: 9;
   display: flex; flex-wrap: wrap; gap: 4px; align-items: center;
   padding: 6px; border-radius: 12px;
   background: var(--panel-solid);
@@ -1702,6 +1740,7 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
 .ne-title { margin-bottom: 4px; }
 .ne-body { min-height: 160px; max-height: 46dvh; }
 .ne-actions { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+
 /* ── Панель «Фокус» ── */
 .focus-panel {
   position: relative; flex: none;
@@ -1712,11 +1751,11 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
   display: flex; flex-direction: column; align-items: center;
   overflow: hidden;
 }
-.fp-poms { min-height: 20px; font-size: 14px; letter-spacing: 2px; }
-.fp-ring-wrap { position: relative; flex: 1; width: 100%; min-height: 0; z-index: 2; }
+.fp-poms { min-height: 20px; font-size: 14px; letter-spacing: 2px; margin-top: -5px; }
+.fp-ring-wrap { position: relative; flex: 1; width: 100%; min-height: 0; z-index: 2; margin-top: 5px; }
 .fp-ring { position: absolute; inset: 0; width: 100%; height: 100%; }
-.fp-track { fill: none; stroke: color-mix(in srgb, var(--text) 12%, transparent); stroke-width: 9; stroke-linecap: round; }
-.fp-fill { fill: none; stroke: var(--accent); stroke-width: 9; stroke-linecap: round; transition: stroke-dasharray .4s linear, stroke var(--dur-mode) var(--ease-mode); }
+.fp-track { fill: none; stroke: color-mix(in srgb, var(--text) 12%, transparent); stroke-width: 12; stroke-linecap: round; }
+.fp-fill { fill: none; stroke: var(--accent); stroke-width: 12; stroke-linecap: round; transition: stroke-dasharray .4s linear, stroke var(--dur-mode) var(--ease-mode); }
 .fp-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; pointer-events: none; }
 .fp-center > * { pointer-events: auto; }
 .fp-caption { font-size: 13px; font-weight: 800; color: var(--text); }
@@ -1728,14 +1767,14 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
   transition: transform .2s var(--ease-bounce), background var(--dur-mode) var(--ease-mode);
 }
 .fp-play svg { width: 24px; height: 24px; }
-.fp-time { font-size: 40px; transform: translateY(-12px); text-shadow: 0 2px 14px rgba(0,0,0,.5), 0 0 4px rgba(0,0,0,.35); }
+.fp-time { font-size: 40px; transform: translateY(-20px); text-shadow: 0 2px 14px rgba(0,0,0,.5), 0 0 4px rgba(0,0,0,.35); }
 .fp-time.shrink { font-size: 26px; }
-.fp-choose { font-size: 14px; font-weight: 700; color: var(--text); text-align: center; line-height: 1.4; animation: none; text-shadow: 0 1px 8px rgba(0,0,0,.4); }
+.fp-choose { font-size: 13px; font-weight: 800; color: var(--text); text-align: center; line-height: 1.35; animation: none; text-shadow: 0 1px 8px rgba(0,0,0,.4); }
 .fp-choose .blink { animation: pulse 1.2s infinite; }
-.fp-total { font-size: 12px; font-weight: 600; color: var(--text); text-align: center; padding-top: 6px; position: relative; z-index: 2; text-shadow: 0 1px 8px rgba(0,0,0,.4); }
+.fp-total { font-size: 11px; font-weight: 600; color: var(--text); text-align: center; padding-top: 2px; position: relative; z-index: 2; text-shadow: 0 1px 8px rgba(0,0,0,.4); }
 .fp-total .fp-total-time { color: var(--accent); font-weight: 800; }
 .fp-controls {
-  position: absolute; left: 50%; bottom: calc(29.5% - 19px);
+  position: absolute; left: 50%; top: 58%; bottom: auto;
   transform: translateX(-50%);
   display: flex; gap: 8px; z-index: 2;
 }
@@ -1776,6 +1815,10 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
 .focus-panel.fx-on .fp-tint { opacity: .35; }
 .focus-panel .fp-poms,
 .focus-panel .fp-total { position: relative; z-index: 2; }
+/* Риски и шкала кольца фокусировки */
+.fp-tick { stroke: var(--dim); stroke-width: 1.5; opacity: .55; }
+.fp-tick.major { stroke-width: 2.2; opacity: .85; }
+.fp-scale { font-size: 12px; font-weight: 700; fill: var(--dim); }
 /* Выбор фокуса: подсвечиваем только подходящие задачи */
 #grid.focus-choosing .r-row:not(.fp-eligible) { opacity: .45; animation: none; }
 #grid.focus-choosing .r-row.fp-eligible { animation: chooseblink 1s ease-in-out infinite; cursor: pointer; }
@@ -1783,6 +1826,7 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
   0%, 100% { background: color-mix(in srgb, var(--accent) 18%, transparent); }
   50% { background: color-mix(in srgb, var(--accent) 42%, transparent); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 60%, transparent); }
 }
+
 /* ── Док виджетов ── */
 .dock { display: flex; gap: 12px; align-items: flex-start; margin-top: 12px; flex-wrap: wrap; }
 #dockTop { margin-top: 0; margin-bottom: 12px; }
@@ -1872,6 +1916,7 @@ body.dock-drag #widgetsBtn::after {
   background: var(--accent-deep);
   color: #fff;
 }
+
 /* ── Меню виджетов ── */
 .widgets-panel { position: fixed; z-index: 47; width: min(320px, calc(100vw - 16px)); border-radius: var(--r-lg); padding: 12px 14px; opacity: 0; pointer-events: none; transform: translateY(-8px) scale(.96); transition: .3s var(--ease-bounce); }
 .widgets-panel.open { opacity: 1; pointer-events: auto; transform: none; }
@@ -1922,6 +1967,7 @@ body.dock-drag #widgetsBtn::after {
   background: color-mix(in srgb, var(--accent) 8%, transparent);
   border-radius: var(--r-lg);
 }
+
 /* ── Календарь: оверлей, виджет, инлайн ── */
 .cal-overlay {
   position: fixed; inset: 0;
@@ -1994,7 +2040,14 @@ body.dock-drag #widgetsBtn::after {
 .cal-legend .lg-open { background: var(--c-started); }
 .cal-legend .lg-done { background: var(--c-done); }
 .cal-hint { font-size: 10.5px; opacity: .7; }
-/* Полоска-календарь в низу липкой шапки */
+/* Календарь: сегодняшний день — как активная неделя */
+.cal-day.tdy {
+  background: var(--accent-deep);
+  box-shadow: 0 3px 12px color-mix(in srgb, var(--accent) 45%, transparent), inset 0 1px 0 rgba(255,255,255,.22);
+}
+.cal-day.tdy .cd-num { color: #fff; }
+.cal-day.tdy.we .cd-num { color: #fff; }
+/* Полоска-календарь внизу липкой шапки */
 .head-cal-strip {
   position: absolute;
   left: 0; right: 0; bottom: 0;
@@ -2041,18 +2094,19 @@ body.dock-drag #widgetsBtn::after {
 .inline-cal-container {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows .45s var(--ease-bounce);
+  transition: grid-template-rows .38s cubic-bezier(.4, 0, .2, 1);
 }
 .inline-cal-container > * { min-height: 0; overflow: hidden; }
 #grid.cal-open .inline-cal-container { grid-template-rows: 1fr; }
 .sq-rows {
   display: grid;
   grid-template-rows: 1fr;
-  transition: grid-template-rows .45s var(--ease-bounce);
+  transition: grid-template-rows .38s cubic-bezier(.4, 0, .2, 1);
 }
 .sq-rows > * { min-height: 0; }
 #grid.cal-open .sq-rows { grid-template-rows: 0fr; }
 #grid.cal-open .sq-rows > * { overflow: hidden; }
+#grid.cal-closing .sq-rows > * { overflow: hidden; }
 .pane.cal-anim { transition: height .32s cubic-bezier(.4, 0, .2, 1); }
 /* Барабан месяцев */
 .cal-drum {
@@ -2122,6 +2176,7 @@ body.dock-drag #widgetsBtn::after {
   border-radius: 2px;
 }
 .cal-resize-handle:hover::before { border-color: var(--accent); }
+
 /* ── ТЕМЫ: 5 обоев + 10 цветов (единственный блок) ── */
 :root[data-theme="sky"]{--bg:#cfdcf2;--tint:#2563eb;}
 :root[data-theme="sunset"]{--bg:#2b1024;--tint:#fb7185;}
@@ -2138,6 +2193,7 @@ body.dock-drag #widgetsBtn::after {
 :root[data-theme="nord"]{--bg:#2e3440;--tint:#88c0d0;}
 :root[data-theme="paper"]{--bg:#f5f1e8;--tint:#d4a574;}
 :root[data-theme="aurora"]{--bg:linear-gradient(135deg,#003b3a,#006d77,#8b5cf6);--tint:#34d399;}
+
 /* ── ПК: неделя — центр шапки задач, поиск — правый край ── */
 @media (min-width: 721px) {
   .r-head { position: relative; }
@@ -2154,19 +2210,19 @@ body.dock-drag #widgetsBtn::after {
   .r-nav #weekLabel { font-size: 16px; color: var(--text); }
   #weekLabel { max-width: none; overflow: visible; }
 }
-.r-search #searchBtn { margin-right: -5px; }
+/* Поиск: отступ как между круглыми кнопками (финальное значение) */
+.r-search { gap: 4px; }
+.r-search #searchBtn { margin-right: 0; }
 /* Недельная надпись: стадии сокращения */
 .wl-num { display: none; }
 @media (min-width: 721px) and (max-width: 1024px) {
   .wl-full { display: none; }
   .wl-short { display: inline; }
 }
-@media (min-width: 721px) and (max-width: 880px) {
-  .wl-num { display: none; }
-}
 @media (min-width: 881px) {
   .wl-num { display: inline; }
 }
+
 /* ── ШРИФТ COMFORTAA ── */
 body, button, input, textarea, select,
 .chip, .btn, .kbd, .tag-pill, .sub-chip, .sub-text,
@@ -2179,6 +2235,18 @@ body, button, input, textarea, select,
 .wp-head, .w-label, .w-status {
   font-family: "Comfortaa", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 }
+
+/* ── Нижняя навигация: БАЗА (до медиа-запросов!) ── */
+.bottomnav { display: none; }
+.bottomnav svg { fill: currentColor; }
+.bottomnav button { display: flex; align-items: center; justify-content: center; gap: 0; border: 0; background: transparent; color: var(--dim); height: 40px; padding: 0 14px; border-radius: 999px; cursor: pointer; }
+.bottomnav button svg { width: 20px; height: 20px; }
+.bottomnav button span { display: none; }
+.bottomnav button:active { transform: scale(0.95); }
+/* Автоскрытие нижней навигации при скролле */
+.bottomnav { transition: transform .25s var(--ease-spring), opacity .2s ease; }
+.bottomnav.hid { transform: translate(-50%, 90px); opacity: 0; pointer-events: none; }
+
 /* ── Мобилка ── */
 @media (max-width: 720px) and (orientation: portrait) {
   .topbar { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
@@ -2266,22 +2334,18 @@ body, button, input, textarea, select,
   #ctBtn { display: none !important; }
   .dock { flex-direction: column; }
   .focus-panel { width: 100%; height: auto; aspect-ratio: 1; max-height: 440px; }
+  .notes-panel { min-height: 0; }
 }
-.bottomnav { display: none; }
-.bottomnav svg { fill: currentColor; }
-.bottomnav button { display: flex; align-items: center; justify-content: center; gap: 0; border: 0; background: transparent; color: var(--dim); height: 40px; padding: 0 14px; border-radius: 999px; cursor: pointer; }
-.bottomnav button svg { width: 20px; height: 20px; }
-.bottomnav button span { display: none; }
-.bottomnav button:active { transform: scale(0.95); }
 @media (max-width: 480px) { .g-meta { display: none; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
 /* ── Скроллбары скрыты везде (скролл остаётся) ── */
 * { scrollbar-width: none; -ms-overflow-style: none; }
 ::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .issued-keys-list { margin-top: 4px; }
-.btn.mini { padding: 4px 10px; font-size: 14px; height: 32px; min-width: 44px; }
+
 /* ── Канбан ── */
-.kanban-panel { display: flex; flex-direction: column; min-height: 62vh; }
+.kanban-panel { display: flex; flex-direction: column; min-height: 0; }
 .kb-head {
   position: sticky; top: var(--stick-top, 0px); z-index: 6;
   margin: -10px -10px 10px; padding: 10px 10px 8px;
@@ -2292,7 +2356,7 @@ body, button, input, textarea, select,
   box-shadow: var(--shadow), var(--inner-glow);
   display: flex; flex-direction: column; gap: 8px;
 }
-.kb-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.kb-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; position: relative; }
 .kb-seg { display: flex; gap: 3px; padding: 3px; border-radius: 999px; background: color-mix(in srgb, var(--text) 7%, transparent); }
 .kb-seg button { border: 0; background: transparent; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 12.5px; color: var(--dim); white-space: nowrap; }
 .kb-seg button.on { background: var(--accent-deep); color: #fff; }
@@ -2307,23 +2371,26 @@ body, button, input, textarea, select,
   display: flex; gap: 10px; overflow-x: auto; flex: 1; min-height: 0;
   scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
   padding-bottom: 4px;
+  max-height: 64vh;
 }
 .kb-col {
-  flex: 1 1 240px; min-width: 220px; max-width: 340px;
+  flex: 1 1 0; min-width: 200px; max-width: none;
   scroll-snap-align: start;
   display: flex; flex-direction: column; min-height: 0;
   background: color-mix(in srgb, var(--text) 4%, transparent);
   border-radius: var(--r-md);
+  position: relative;
 }
 .kb-col.kb-over { outline: 2px dashed var(--accent); outline-offset: -2px; background: color-mix(in srgb, var(--accent) 8%, transparent); }
 .kb-col-head {
-  display: flex; align-items: center; gap: 6px; padding: 8px 10px;
+  display: flex; align-items: center; gap: 6px; padding: 8px 10px 8px 30px;
   border-bottom: 1px solid var(--brd);
   font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--dim);
 }
 .kb-col-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .kb-count { font-size: 11px; background: var(--card); border-radius: 999px; padding: 1px 8px; flex: none; }
 .kb-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.kb-dot-w { box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 35%, transparent); }
 .kb-eye { margin-left: auto; width: 26px; height: 26px; border: 0; border-radius: 50%; background: transparent; color: var(--dim); font-size: 13px; flex: none; }
 .kb-eye:hover { color: var(--accent); }
 .kb-col-body { padding: 8px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; min-height: 70px; }
@@ -2349,17 +2416,19 @@ body, button, input, textarea, select,
   opacity: .95;
 }
 body.kb-drag { user-select: none; -webkit-user-select: none; }
-@media (max-width: 720px) {
-  .kb-col { flex: 0 0 82%; max-width: none; }
-  .kb-periods { margin-left: 0; }
-}
-/* ── Канбан: кнопка и меню видов ── */
+/* Канбан: карточки подсвечены цветом своего режима (в режиме «Все») */
+:root[data-mode="all"] .kb-card.m-work { background: color-mix(in srgb, var(--mode-work) 14%, var(--card)); }
+:root[data-mode="all"] .kb-card.m-home { background: color-mix(in srgb, var(--mode-home) 14%, var(--card)); }
+:root[data-mode="all"] .kb-card.m-study { background: color-mix(in srgb, var(--mode-study) 14%, var(--card)); }
+/* Канбан: ручки столбиков, перетаскивание колонок */
+.kb-col .kb-col-handle { width: 26px; height: 26px; z-index: 4; }
+.kb-coldragging { opacity: .5; outline: 2px dashed var(--accent); outline-offset: -2px; }
+/* Канбан: кнопка и меню видов */
 @media (max-width: 720px) { #kanbanBtn { display: none; } }
 #viewMenu { z-index: 60; }
-/* ── Канбан: рейндж-навигация, троеточие, поиск в шапках ── */
 @media (max-width: 720px) { #viewBtn { display: none; } }
 .topbar.kanban-active .wn-center { display: none; }
-.kb-row { position: relative; }
+/* Канбан: рейндж-навигация, троеточие, поиск в шапках */
 .kb-rangenav {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
   display: flex; align-items: center; gap: 6px; max-width: 56%;
@@ -2372,65 +2441,34 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
 .kb-arrow:hover { color: var(--accent); transform: scale(1.06); }
 #kbRangeChip { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .kb-right { margin-left: auto; display: flex; align-items: center; gap: 4px; flex: none; }
-.r-search { gap: 4px; }
-/* ── Канбан: фиксы (троеточие, текст-диапазон, ширина столбиков) ── */
-#viewBtn { margin-right: -5px; }
+/* Канбан: надпись диапазона (слитый финальный блок) */
 .kb-rangelabel {
   border: 0;
   background: transparent;
   font-weight: 700;
-  padding: 6px 4px;
+  padding: 9px 4px;
   white-space: nowrap;
   max-width: 46vw;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text);
+  position: relative;
+  bottom: -3px;
 }
 .kb-rangelabel:hover { color: var(--accent); }
 @media (min-width: 721px) { .kb-rangelabel { font-size: 16px; } }
-.kb-col { flex: 1 1 0; min-width: 200px; max-width: none; }
-@media (max-width: 720px) { .kb-col { flex: 0 0 82%; min-width: 0; } }
-/* ── Канбан: ручки столбиков, перетаскивание колонок, статусы ── */
-.kb-col { position: relative; }
-.kb-col .kb-col-head { padding: 8px 10px 8px 30px; }
-.kb-col-handle { width: 26px; height: 26px; z-index: 4; }
-.kb-coldragging { opacity: .5; outline: 2px dashed var(--accent); outline-offset: -2px; }
-/* ── Канбан: поиск сдвинут влево, надпись диапазона отпущена ── */
-.r-search #searchBtn { margin-right: -2px; }
-.kb-rangelabel { padding: 9px 4px; }
-/* ── Канбан: высота панели по контенту (потолок 64vh) ── */
-.kanban-panel { min-height: 0; }
-.kb-cols { max-height: 64vh; }
-
-/* ── Календарь: сегодняшний день — как активная неделя ── */
-.cal-day.tdy {
-  background: var(--accent-deep);
-  box-shadow: 0 3px 12px color-mix(in srgb, var(--accent) 45%, transparent), inset 0 1px 0 rgba(255,255,255,.22);
-}
-.cal-day.tdy .cd-num { color: #fff; }
-.cal-day.tdy.we .cd-num { color: #fff; }
-
-/* ── Меню-селекторы: концентричные скругления (внешнее = пункт + отступ) ── */
-.cmenu { border-radius: 14px; padding: 4px; }
-.cmenu button { border-radius: 10px; }
-
-/* ── Канбан: карточки подсвечены цветом своего режима (в режиме «Все») ── */
-:root[data-mode="all"] .kb-card.m-work { background: color-mix(in srgb, var(--mode-work) 14%, var(--card)); }
-:root[data-mode="all"] .kb-card.m-home { background: color-mix(in srgb, var(--mode-home) 14%, var(--card)); }
-:root[data-mode="all"] .kb-card.m-study { background: color-mix(in srgb, var(--mode-study) 14%, var(--card)); }
-
-/* ── Канбан: надпись диапазона на 3px ниже ── */
-.kb-rangelabel { position: relative; bottom: -3px; }
-/* ── Канбан: заголовок доски вместо сегмента ── */
+/* Канбан: заголовок доски (слитый финальный блок) */
 .kb-board-title {
   border: 0;
   background: transparent;
-  padding: 2px 6px;
+  padding: 2px 0;
   font-weight: 800;
   font-size: 20px;
   letter-spacing: .02em;
   color: var(--text);
   border-radius: 10px;
+  text-transform: none;
+  cursor: pointer;
   transition: color .25s ease, text-shadow .25s ease;
 }
 .kb-board-title:hover {
@@ -2440,33 +2478,53 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
     0 0 26px color-mix(in srgb, var(--accent) 60%, transparent),
     0 0 46px color-mix(in srgb, var(--accent) 38%, transparent);
 }
-.cmenu .cm-ico { font-size: 16px; line-height: 1; }
-
-/* ── Блоб: цвет красится из JS покадрово, transition на background не нужен ── */
-.mode-blob {
-  transition:
-    left 700ms var(--ease-bounce),
-    width 700ms var(--ease-bounce),
-    box-shadow var(--dur-mode) var(--ease-mode),
-    opacity 300ms ease;
-}
-/* ── Running-list / kanban-доска: унификация шапок ── */
-.r-search #searchBtn { margin-right: -3px; }
-.kb-board-title { text-transform: none; }
-.kb-dot-w { box-shadow: 0 0 0 1px color-mix(in srgb, var(--text) 35%, transparent); }
-/* ── Док над канбаном: панель уступает место при переносе виджетов ── */
+/* Док над канбаном: панель уступает место при переносе виджетов */
 #kanbanPanel { transition: transform .25s var(--ease-spring); }
 #kanbanPanel.kb-yield-top { transform: translateY(18px); }
 #kanbanPanel.kb-yield-bottom { transform: translateY(-18px); }
-/* ── Поиск плотнее к кнопке смены вида ── */
-.r-search #searchBtn { margin-right: -7px; }
 
-/* ── Заметки: пробел перед «· сегодня» в надписи даты ── */
-.notes-day-label .nd-today { margin-left: 7px; }
-
-/* ── Поиск: отступ как между круглыми кнопками ── */
-.r-search { gap: 4px; }
-.r-search #searchBtn { margin-right: 0; }
+/* ── Пиктограмма смены вида: точки на линии приоритета ── */
+#viewBtn.view-toggle {
+  width: 4px;
+  min-width: 4px;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  color: var(--text);
+  flex: none;
+  transition: color .25s ease, filter .25s ease;
+}
+#viewBtn.view-toggle::after {
+  content: '';
+  position: absolute;
+  inset: -10px -14px; /* зона нажатия вокруг узкой колонки точек */
+}
+#viewBtn.view-toggle svg {
+  width: 4px;
+  height: 20px;
+  fill: currentColor;
+  stroke: none;
+  opacity: 1;
+  display: block;
+}
+#viewBtn.view-toggle:hover {
+  color: var(--accent);
+  filter:
+    drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 85%, transparent))
+    drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 55%, transparent))
+    drop-shadow(0 0 24px color-mix(in srgb, var(--accent) 35%, transparent));
+  transform: none;
+}
+.r-head #viewBtn.view-toggle { margin-right: 8px; }
+.kb-row > #viewBtn.view-toggle { margin-right: 0; } /* в канбане отступ даёт gap: 8px */
+.kb-head .kb-row { padding-left: 10px; } /* точки канбана на линии приоритета карточек */
 
 /* ── Редактор: календарь вместо «Дней», ряды карточек, файлы до границ ── */
 .ed-card:has(#edCal) #edDays,
@@ -2475,10 +2533,9 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
 .ed-card:has(#edCal) #edCal { margin: 0; }
 .ed-row { display: flex; gap: 10px; align-items: stretch; margin-bottom: 10px; }
 .ed-row > .ed-card { margin-bottom: 0; flex: 1 1 0; min-width: 0; }
-.ed-row-cal > .ed-card:first-child { flex: 1 1 auto; }
+.ed-row-cal > .ed-card:first-child { flex: 7 1 0; min-width: 0; }
 .ed-row-cal > .ed-card:has(#edPrio) {
-  flex: 0 0 auto;
-  aspect-ratio: 1 / 1;
+  flex: 3 1 0; min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -2492,6 +2549,8 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
 }
 .ed-row-cal > .ed-card:has(#edPrio) #edPrio .chip { width: 100%; text-align: center; }
 .ed-row-half > .ed-card { flex: 1 1 50%; }
+.ed-row-notes > .ed-card:first-child { flex: 3 1 0; min-width: 0; }
+.ed-row-notes > .ed-card:has(#edFiles) { flex: 2 1 0; min-width: 0; }
 .ed-card-bleed {
   margin-left: -16px;
   margin-right: -16px;
@@ -2500,16 +2559,11 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
 }
 @media (max-width: 720px) {
   .ed-row { flex-direction: column; }
-  .ed-row-cal > .ed-card:has(#edPrio) { aspect-ratio: auto; }
 }
 @media (min-width: 721px) {
   .editor { width: min(952px, calc(100vw - 24px)); max-height: min(92dvh, 900px); }
 }
-/* ── Редактор: ряды 60/40 и 50/50, барабан-календарь без полосок ── */
-.ed-row-cal > .ed-card:first-child { flex: 3 1 0; min-width: 0; }
-.ed-row-cal > .ed-card:has(#edPrio) { flex: 2 1 0; min-width: 0; aspect-ratio: auto; }
-.ed-row-notes > .ed-card:first-child { flex: 3 1 0; min-width: 0; }
-.ed-row-notes > .ed-card:has(#edFiles) { flex: 2 1 0; min-width: 0; }
+/* Редактор: барабан-календарь без полосок */
 #edCal { margin: 0; }
 #edCal .cal-head { justify-content: center; margin-bottom: 4px; }
 #edCal .cal-m-week {
@@ -2533,112 +2587,59 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
 #edCal .cd-dot { display: none; }
 #edCal .cal-day.on { background: color-mix(in srgb, var(--accent) 14%, transparent); }
 #edCal .cal-day.on .cd-num { color: var(--accent); }
-/* ── Редактор: календарь 70% / приоритет 30% ── */
-.ed-row-cal > .ed-card:first-child { flex: 7 1 0; }
-.ed-row-cal > .ed-card:has(#edPrio) { flex: 3 1 0; }
-/* ── Пиктограмма смены вида: без фона-кнопки, в 14px от надписи шапки ── */
-#viewBtn.view-toggle {
-  width: auto;
-  height: auto;
-  min-width: 0;
+
+/* ── Редактор: без подбородка — галочка круглой кнопкой над блоками ── */
+.ed-actions {
+  position: absolute;
+  right: 14px;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  z-index: 6;
   border: 0;
-  background: transparent;
-  box-shadow: none;
-  border-radius: 8px;
-  padding: 0;
-  margin-left: 14px;
-  display: inline-flex;
-  align-items: center;
-  color: var(--text);
-  flex: none;
-  transition: color .25s ease, filter .25s ease;
-}
-/* в шапке канбана уже есть gap 8px — компенсируем, чтобы итого было 14px */
-.kb-row > #viewBtn.view-toggle { margin-left: 6px; }
-#viewBtn.view-toggle svg {
-  width: 20px;
-  height: 20px;
-  fill: none;
-  stroke: currentColor;
-  opacity: 1;
-  display: block;
-}
-#viewBtn.view-toggle:hover {
-  color: var(--accent);
-  filter:
-    drop-shadow(0 0 6px color-mix(in srgb, var(--accent) 85%, transparent))
-    drop-shadow(0 0 14px color-mix(in srgb, var(--accent) 55%, transparent))
-    drop-shadow(0 0 24px color-mix(in srgb, var(--accent) 35%, transparent));
-  transform: none;
-}
-/* ── Троеточие перед заголовком: точки залиты, отступ ДО заголовка 14px ── */
-#viewBtn.view-toggle svg { fill: currentColor; stroke: none; width: 18px; height: 18px; }
-#viewBtn.view-toggle { margin-left: 0; margin-right: 14px; }
-.kb-row > #viewBtn.view-toggle { margin-left: 0; margin-right: 6px; } /* 6px + gap 8px = 14px */
-.kb-board-title { cursor: pointer; }
-/* ── Троеточие на линии приоритета, надпись в 8px от него ── */
-#viewBtn.view-toggle {
-  width: 4px;
-  min-width: 4px;
   padding: 0;
   margin: 0;
-  position: relative;
-  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  pointer-events: none;
 }
-#viewBtn.view-toggle::after {
-  content: '';
-  position: absolute;
-  inset: -10px -14px; /* зона нажатия вокруг узкой колонки точек */
+.ed-actions > * { pointer-events: auto; }
+.ed-actions .spacer,
+.ed-actions .btn.danger,
+.ed-actions .btn:not(.primary) { display: none; }
+.ed-actions .btn.primary {
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 26px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  background: var(--accent-deep);
+  color: #fff;
+  box-shadow:
+    0 8px 20px color-mix(in srgb, var(--accent) 45%, transparent),
+    0 16px 32px color-mix(in srgb, var(--accent) 28%, transparent),
+    inset 0 1px 0 rgba(255,255,255,.3);
 }
-#viewBtn.view-toggle svg { width: 4px; height: 20px; display: block; }
-.r-head #viewBtn.view-toggle { margin-right: 8px; }
-.kb-row > #viewBtn.view-toggle { margin-right: 0; } /* в канбане отступ даёт gap: 8px */
-.kb-head .kb-row { padding-left: 10px; } /* точки канбана на линии приоритета карточек */
-.kb-board-title { padding: 2px 0; }
-
-/* ── Заметки: высота по тексту (+1 строка), тулбар только по выделению ── */
-.notes-panel { transition: height .3s var(--ease-spring); min-height: 0; }
-.notes-editor { min-height: 24px; }
-/* ── Заметки: заголовок = первая строка, тулбар над выделением, без плейсхолдеров ── */
-.note-title { display: none; }
-.notes-editor:empty::before { content: none; }
-.notes-editor .nn-h { font-size: 17px; font-weight: 800; }
-.notes-toolbar {
-  left: 0;
-  right: auto;
-  bottom: auto;
-  top: 0;
-  width: max-content;
-  max-width: calc(100% - 16px);
-  z-index: 9;
-}
-
-/* ── Заметки: минимальная высота равна панели фокусировки ── */
-.notes-panel { min-height: var(--focus-size); }
+.ed-actions .btn.primary:hover { transform: scale(1.06); }
+.ed-actions .btn.primary:active { transform: scale(.94); }
+.ed-scroll { padding-bottom: 84px; }
+/* Мобилка: редактор задачи во весь экран, вне Dynamic Island/статуса и домашней зоны */
 @media (max-width: 720px) {
-  .notes-panel { min-height: 0; }
+  .editor {
+    left: 8px;
+    right: 8px;
+    top: calc(env(safe-area-inset-top, 0px) + 8px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    width: auto;
+    max-width: none;
+    max-height: none;
+    border-radius: var(--r-lg);
+    transform: translateY(105%);
+  }
+  .editor.open { transform: translateY(0); }
 }
 
-/* ── Селектор вида: SVG-иконки в пунктах меню ── */
-.cmenu .cm-ico { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; }
-/* ── Молнии (⚡ над кольцом): чуть выше, кольцу больше места ── */
-.fp-poms { margin-top: -5px; }
-
-/* ── Риски и шкала кольца фокусировки ── */
-.fp-tick { stroke: var(--dim); stroke-width: 1.5; opacity: .55; }
-.fp-tick.major { stroke-width: 2.2; opacity: .85; }
-.fp-scale { font-size: 11px; font-weight: 700; fill: var(--dim); }
-
-/* ── Фокус: кольцо больше и выше, 5px от молний до кольца ── */
-.fp-track, .fp-fill { stroke-width: 12; }
-.fp-ring-wrap { margin-top: 5px; }
-.fp-controls { bottom: 0; }
-.fp-total { padding-top: 2px; font-size: 11px; }
-.fp-scale { font-size: 12px; font-weight: 700; fill: var(--dim); }
-/* ── Фокус: кнопки в кольцо, шкала под концами, текст выбора как капшен ── */
-.fp-time { transform: translateY(-20px); }
-.fp-controls { bottom: auto; top: 58%; }
-.fp-choose { font-size: 13px; font-weight: 800; line-height: 1.35; }
 /* ── Мобилка: квадраты задач = цветные полоски, тап раскрывает в квадраты ── */
 @media (max-width: 720px) {
   /* пунктир между задачами убираем, даём воздух */
@@ -2681,89 +2682,11 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
   .p-mobile .m-task.sq-open .cell.c-skipped { border: 2px solid var(--c-skipped); background: transparent; }
   .p-mobile .m-task.sq-open .cell::after,
   .p-mobile .m-task.sq-open .cell .rd { opacity: 1; transition: opacity .22s ease .12s; }
-}
-/* ── Мобилка: задачи плотнее, раскрытые квадраты раздвигают ленту ── */
-@media (max-width: 720px) {
+  /* задачи плотнее, раскрытые квадраты раздвигают ленту */
   .p-mobile .l-row { margin: 0; }
   .m-task { margin-bottom: 4px; transition: margin-bottom .32s var(--ease-spring); }
   .m-task.sq-open { margin-bottom: 12px; }
-  /* открытый квадрат «Запланировано» — белый, как его полоска */
-  .p-mobile .m-task.sq-open .cell.c-todo {
-    background: #fff;
-    border-color: transparent;
-    box-shadow: 0 1px 2px rgba(0,0,0,.28);
-  }
-}
-/* ── Инлайн-календарь: плавная высота без рывков ── */
-.inline-cal-container, .sq-rows { transition: grid-template-rows .38s cubic-bezier(.4, 0, .2, 1); }
-#grid.cal-closing .sq-rows > * { overflow: hidden; }
-/* ── Мобилка: редактор задачи во весь экран, верх — по линии липкой шапки ── */
-@media (max-width: 720px) {
-  .editor {
-    left: 0; right: 0;
-    top: var(--stick-top, 0px);
-    bottom: 0;
-    width: auto;
-    max-width: none;
-    max-height: none;
-    border-radius: 18px 18px 0 0;
-    transform: translateY(102%);
-  }
-  .editor.open { transform: translateY(0); }
-}
-/* ── Редактор: без подбородка — галочка круглой кнопкой над блоками (ПК и мобилка) ── */
-.ed-actions {
-  position: absolute;
-  right: 14px;
-  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-  z-index: 6;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  background: transparent;
-  box-shadow: none;
-  pointer-events: none;
-}
-.ed-actions > * { pointer-events: auto; }
-.ed-actions .spacer,
-.ed-actions .btn.danger,
-.ed-actions .btn:not(.primary) { display: none; }
-.ed-actions .btn.primary {
-  width: 56px;
-  height: 56px;
-  padding: 0;
-  border-radius: 50%;
-  font-size: 26px;
-  line-height: 1;
-  display: grid;
-  place-items: center;
-  background: var(--accent-deep);
-  color: #fff;
-  box-shadow:
-    0 8px 20px color-mix(in srgb, var(--accent) 45%, transparent),
-    0 16px 32px color-mix(in srgb, var(--accent) 28%, transparent),
-    inset 0 1px 0 rgba(255,255,255,.3);
-}
-.ed-actions .btn.primary:hover { transform: scale(1.06); }
-.ed-actions .btn.primary:active { transform: scale(.94); }
-.ed-scroll { padding-bottom: 84px; }
-/* ── Мобилка: редактор вне Dynamic Island/статуса и домашней зоны ── */
-@media (max-width: 720px) {
-  .editor {
-    left: 8px;
-    right: 8px;
-    top: calc(env(safe-area-inset-top, 0px) + 8px);
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
-    width: auto;
-    max-width: none;
-    max-height: none;
-    border-radius: var(--r-lg);
-    transform: translateY(105%);
-  }
-  .editor.open { transform: translateY(0); }
-}
-/* ── Мобилка: текст → 5px → полоски → 3px → пунктир → 5px → следующий текст ── */
-@media (max-width: 720px) {
+  /* текст → 5px → полоски → 3px → пунктир → 5px → следующий текст */
   .p-mobile .r-row { padding: 5px 8px 0; min-height: 0; }
   .p-mobile .l-row { margin: 5px 0 0; }
   .m-task {
@@ -2776,10 +2699,7 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
   .m-task.sq-open { margin-bottom: 0; padding-bottom: 8px; }
   /* квадраты в раскрытом виде выше по вертикали */
   .p-mobile .m-task.sq-open .cell { height: 30px; border-radius: 8px; }
-}
-/* ── Мобилка: полоски вплотную к тексту задачи, аккуратная лесенка отступов ── */
-@media (max-width: 720px) {
-  /* ряд полосок больше не наследует высоту строки 38px — полоски не висят в воздухе */
+  /* полоски вплотную к тексту задачи */
   .p-mobile .l-row {
     min-height: 0;
     margin: 4px 0 0;
@@ -2796,12 +2716,7 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
   }
   .m-task:last-child { border-bottom: 0; padding-bottom: 2px; }
   .m-task.sq-open { padding-bottom: 10px; }
-}
-/* ── Меню троеточия недели: ширина по надписи, без переносов ── */
-#hideMenu { width: max-content; min-width: 200px; max-width: calc(100vw - 16px); }
-#hideMenu button { white-space: nowrap; }
-/* ── Мобилка: троеточие — первая колонка шапки, дни и полоски строго по колонкам ── */
-@media (max-width: 720px) {
+  /* троеточие — первая колонка шапки, дни и полоски строго по колонкам */
   .p-mobile .m-head {
     grid-template-columns: 4px repeat(7, minmax(0, 1fr));
   }
@@ -2817,24 +2732,7 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
     grid-template-columns: 4px repeat(7, minmax(0, 1fr));
   }
   .p-mobile .l-row::before { content: ''; }
-  /* ── Канбан: рейндж-навигация не налезает на заголовок, уходит вправо ── */
-  .kb-rangenav {
-    position: static;
-    transform: none;
-    margin-left: auto;
-    max-width: none;
-  }
-  .kb-row { flex-wrap: wrap; }
-  .kb-board-title {
-    flex: 0 1 auto;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-}
-/* ── Мобилка: липкая шапка в две строки (заголовок + дни) ── */
-@media (max-width: 720px) {
+  /* липкая шапка в две строки (заголовок + дни) */
   .p-mobile .m-head {
     display: flex;
     flex-direction: column;
@@ -2860,21 +2758,15 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
   /* спейсер-колонка не нужна: полоски строго под днями */
   .p-mobile .l-row { grid-template-columns: repeat(7, minmax(0, 1fr)); }
   .p-mobile .l-row::before { content: none; }
-}
-/* ── Мобилка: квадрат «Запланировано» в раскрытом виде = контур как на ПК ── */
-@media (max-width: 720px) {
+  /* квадрат «Запланировано» в раскрытом виде = контур как на ПК */
   .p-mobile .m-task.sq-open .cell.c-todo {
     background: transparent;
     border: 2px solid var(--c-todo);
     box-shadow: none;
   }
-}
-/* ── Мобилка: приоритеты задач на одной линии с троеточием шапки ── */
-@media (max-width: 720px) {
+  /* приоритеты задач на одной линии с троеточием шапки */
   .p-mobile .r-row { padding-left: 0; padding-right: 8px; }
-}
-/* ── Мобилка: шапка канбана = первая строка шапки Running-list ── */
-@media (max-width: 720px) {
+  /* шапка канбана = первая строка шапки Running-list */
   .kb-head { padding: 8px 10px; }
   .kb-row { min-height: 30px; flex-wrap: nowrap; gap: 8px; }
   .kb-row .kb-board-title {
@@ -2904,7 +2796,8 @@ body.kb-drag { user-select: none; -webkit-user-select: none; }
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  .kb-col { flex: 0 0 82%; min-width: 0; }
 }
-/* ── Автоскрытие нижней навигации при скролле ── */
-.bottomnav { transition: transform .25s var(--ease-spring), opacity .2s ease; }
-.bottomnav.hid { transform: translate(-50%, 90px); opacity: 0; pointer-events: none; }
+/* Меню троеточия недели: ширина по надписи, без переносов */
+#hideMenu { width: max-content; min-width: 200px; max-width: calc(100vw - 16px); }
+#hideMenu button { white-space: nowrap; }
