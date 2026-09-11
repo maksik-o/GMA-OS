@@ -26,7 +26,7 @@ const notify = () => {
   }, 100);
 };
 const userChange = () => document.dispatchEvent(new CustomEvent('user-change'));
-const cap = s => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+const cap = s => (s ? s.charAt(0).toUpperCase() : s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 
 /* ── Prune: удалённые заметки старше 30 дней вычищаются ── */
 const NOTE_PRUNE_MS = 30 * 24 * 60 * 60 * 1000;
@@ -118,9 +118,7 @@ async function toggleFavorite(id) {
   userChange();
 }
 
-/* ── Авто-рост панели: высота = контент + 1 строка, плавно.
-   min-height на время замера сбрасываем, иначе панель вырастает
-   на +1 строку ПОВЕРХ минимума (минимум = высота фокус-панели). ── */
+/* ── Авто-рост панели: высота = контент + 1 строка, плавно ── */
 const LINE_PX = 24;
 function autoGrow(instant) {
   const c = _panelEl;
@@ -141,6 +139,12 @@ function autoGrow(instant) {
     return;
   }
   requestAnimationFrame(() => { c.style.height = target + 'px'; });
+}
+
+/* ── Пустое поле: класс is-empty управляет разлиновкой из CSS ── */
+function syncEmptyClass() {
+  if (!_editorEl) return;
+  _editorEl.classList.toggle('is-empty', !_editorEl.textContent.trim());
 }
 
 /* ── Первая строка = заголовок: держим класс nn-h на первом блоке ── */
@@ -308,6 +312,7 @@ export function renderNotesPanel(container) {
 <div class="notes-editor" contenteditable="true">${_currentNote ? _currentNote.html : ''}</div>`;
   _editorEl = container.querySelector('.notes-editor');
   ensureHeadLine();
+  syncEmptyClass();
   bindNotesEvents(container);
   autoGrow(true);
 }
@@ -334,6 +339,7 @@ function positionToolbar() {
   bar.style.left = x + 'px';
   bar.style.top = y + 'px';
 }
+
 function bindNotesEvents(container) {
   container.querySelector('.notes-favorite').onclick = async () => {
     const n = await ensureNote();
@@ -375,6 +381,7 @@ function bindNotesEvents(container) {
       await deleteNote(_currentNote.id);
       if (_editorEl) _editorEl.innerHTML = '';
       container.classList.remove('editing');
+      syncEmptyClass();
       autoGrow(false);
     }
   };
@@ -383,9 +390,10 @@ function bindNotesEvents(container) {
     _selBound = true;
     document.addEventListener('selectionchange', positionToolbar);
   }
-  /* Ввод: заголовок-первая строка + автосохранение + рост */
+  /* Ввод: заголовок-первая строка + автосохранение + рост + разлиновка */
   _editorEl.addEventListener('input', () => {
     ensureHeadLine();
+    syncEmptyClass();
     scheduleSave();
     autoGrow(false);
   });
@@ -493,7 +501,7 @@ function showNotesList() {
   overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
 }
 
-/* ── Просмотр и редактирование заметки из списка (без отдельного заголовка) ── */
+/* ── Просмотр и редактирование заметки из списка ── */
 function openNoteEditor(n, listOverlay) {
   const ov = document.createElement('div');
   ov.className = 'notes-list-overlay';
