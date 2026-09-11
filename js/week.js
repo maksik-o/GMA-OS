@@ -13,6 +13,7 @@ import * as tm from './timer.js';
 import * as fc from './focus.js';
 
 const $ = id => document.getElementById(id);
+
 const ARROW_DOWN = '<svg viewBox="0 0 20 20"><path d="M10 2v16M4 12l6 6 6-6" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const I = {
   todo: '<svg viewBox="0 0 20 20"><rect x="3.5" y="3.5" width="13" height="13" rx="2.5"/></svg>',
@@ -30,6 +31,7 @@ const MENU = [
   ['postponed', 'Перенесено', I.postponed],
   [null, 'Убрать квадрат', I.remove]
 ];
+
 /* ── Мобилка: скрытие рядов квадратов недели (локально) ── */
 let hideSquares = localStorage.getItem('rl_hide_squares') === '1';
 export const squaresHidden = () => hideSquares;
@@ -38,9 +40,6 @@ export function toggleSquares() {
   try { localStorage.setItem('rl_hide_squares', hideSquares ? '1' : ''); } catch (e) {}
   renderAll();
 }
-/* ── Иконки пункта «квадраты недели» ── */
-const ICON_GRID = '<svg viewBox="0 0 24 24"><rect x="4" y="5" width="4" height="14" rx="1.5"/><rect x="10" y="5" width="4" height="14" rx="1.5"/><rect x="16" y="5" width="4" height="14" rx="1.5"/></svg>';
-const ICON_GRID_OFF = '<svg viewBox="0 0 24 24"><rect x="4" y="5" width="4" height="14" rx="1.5"/><rect x="10" y="5" width="4" height="14" rx="1.5"/><rect x="16" y="5" width="4" height="14" rx="1.5"/><line x1="4" y1="20" x2="20" y2="4"/></svg>';
 
 let expandedSub = null;
 let expandedSq = null; // мобилка: чьи квадраты раскрыты из полосок
@@ -53,6 +52,7 @@ function applyGridSide() {
   const g = $('grid');
   if (g) g.classList.toggle('swapped', gridSwapped);
 }
+
 /* ── Перенос панели квадратов: только горизонтально, бросок — мгновенно ── */
 function bindPaneMoveHandle() {
   const grid = $('grid');
@@ -108,6 +108,7 @@ function bindPaneMoveHandle() {
     document.addEventListener('pointercancel', finish);
   });
 }
+
 /* ── Синхронизация высот строк ── */
 let _rowResizeObserver = null;
 function syncRowHeights() {
@@ -136,6 +137,7 @@ function syncRowHeights() {
     window.addEventListener('resize', align);
   }
 }
+
 /* ── Закрытие панели подзадач по тапу/скроллу снаружи ── */
 let subOutsideBound = false;
 function ensureSubCollapse() {
@@ -159,10 +161,12 @@ function ensureSubCollapse() {
   document.addEventListener('pointerdown', onDown);
   if (app) app.addEventListener('scroll', onScroll, { passive: true });
 }
+
 export function closeCellMenu() {
   const m = document.getElementById('cellMenu');
   if (m) m.classList.remove('open');
 }
+
 function openCellMenu(cell, id, day) {
   const task = getTask(id);
   if (!task) { closeCellMenu(); return; }
@@ -197,6 +201,7 @@ function openCellMenu(cell, id, day) {
     document.addEventListener('pointerdown', close);
   }, 0);
 }
+
 let swiped = false;
 function weekRangeLabels() {
   const a = state.weekStart, b = addDays(a, 6);
@@ -206,10 +211,12 @@ function weekRangeLabels() {
   const full = ma === mb ? `${da} – ${db} ${MONTHS_FULL[ma - 1]}` : `${da} ${MONTHS_FULL[ma - 1]} – ${db} ${MONTHS_FULL[mb - 1]}`;
   return { full, short };
 }
+
 export function shiftWeek(dir) {
   state.weekStart = addDays(state.weekStart, dir * 7);
   renderAll();
 }
+
 export function goToday() {
   const d = parseISO(today());
   d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
@@ -217,6 +224,7 @@ export function goToday() {
   if (dayOpen()) state.day = today();
   renderAll();
 }
+
 /* ── Анимация смены режима: конвейер по слоям, без наезда панелей. ── */
 let modeAnimBusy = false;
 function collectRowBlocks() {
@@ -240,6 +248,7 @@ const orderRow = (blocks, asc) => blocks
   .map(b => { const r = b.getBoundingClientRect(); return { b, x: r.left + r.width / 2 }; })
   .sort((a, c) => (asc ? a.x - c.x : c.x - a.x))
   .map(o => o.b);
+
 async function switchModeWithAnim(nextId) {
   const order = MODES.map(m => m.id);
   const from = order.indexOf(state.mode);
@@ -307,6 +316,7 @@ async function switchModeWithAnim(nextId) {
     runRow(rows.bottom, false, 2 * ROW_STEP),
   ]).then(() => { modeAnimBusy = false; });
 }
+
 let _modeBlobInitialized = false;
 /* ── Цвет блоба: покадровая rAF-интерполяция RGB в JS ── */
 function modeColorOf(id) {
@@ -402,6 +412,7 @@ function updateModeBlob() {
   });
 }
 window.addEventListener('resize', updateModeBlob);
+
 function metaHTML(tk) {
   const meta = [];
   if ((tk.subtasks || []).length) {
@@ -430,11 +441,12 @@ function indHTML(tk) {
 }
 function subPanelHTML(tk) {
   return `<div class="sub-panel glass">${(tk.subtasks || []).map(s => `<div class="sub-row">
-    <button type="button" class="cell sub ${s.done ? 'c-done' : 'c-todo'}" data-subtoggle="${s.id}" title="${s.done ? 'Выполнено' : 'Запланировано'}"></button>
-    <span class="sub-text${s.done ? ' done' : ''}" title="Редактировать">${esc(s.text)}</span>
-    <button type="button" class="sub-del" data-subdel="${s.id}" title="Удалить подзадачу">✕</button>
-  </div>`).join('')}</div>`;
+<button type="button" class="cell sub ${s.done ? 'c-done' : 'c-todo'}" data-subtoggle="${s.id}" title="${s.done ? 'Выполнено' : 'Запланировано'}"></button>
+<span class="sub-text${s.done ? ' done' : ''}" title="Редактировать">${esc(s.text)}</span>
+<button type="button" class="sub-del" data-subdel="${s.id}" title="Удалить подзадачу">✕</button>
+</div>`).join('')}</div>`;
 }
+
 /* ── Шапка дней (ПК) + полоска-календарь ── */
 function headHTML(t) {
   let h = '';
@@ -445,6 +457,7 @@ function headHTML(t) {
   if (!hasWidget('calendar')) h += '<button type="button" class="head-cal-strip" title="Открыть календарь"></button>';
   return h;
 }
+
 /* ── Мобилка: двухрядная липкая шапка: троеточие+заголовок+неделя / дни ── */
 function mobileHeadHTML(t) {
   let days = '';
@@ -459,6 +472,7 @@ function mobileHeadHTML(t) {
     '<div class="m-head-days">' + days + '</div>' +
     (!hasWidget('calendar') ? '<button type="button" class="head-cal-strip" title="Открыть календарь"></button>' : '');
 }
+
 /* ── Инлайн-календарь: барабан в шапке ── */
 function renderInlineCal(el) {
   let head = el.querySelector('.inline-cal-head');
@@ -499,6 +513,7 @@ function refreshInlineCals() {
   const g = $('grid');
   if (g) g.classList.toggle('cal-open', inlineCalOpen);
 }
+
 /* ── Плавное открытие/закрытие инлайн-календаря БЕЗ рывков высоты ── */
 function toggleInlineCal(force) {
   const open = typeof force === 'boolean' ? force : !inlineCalOpen;
@@ -538,6 +553,7 @@ function toggleInlineCal(force) {
   });
   setTimeout(() => inner.forEach(el => { el.style.transition = ''; }), 400);
 }
+
 /* ── Любой скролл закрывает инлайн-календарь в шапку (кроме скролла самого барабана) ── */
 (function bindInlineCalScrollClose() {
   const close = () => { if (inlineCalOpen) toggleInlineCal(false); };
@@ -548,6 +564,7 @@ function toggleInlineCal(force) {
     close();
   }, { passive: true });
 })();
+
 function leftRowHTML(tk, t) {
   let cells = '';
   for (let i = 0; i < 7; i++) {
@@ -558,6 +575,7 @@ function leftRowHTML(tk, t) {
   }
   return `<div class="l-row">${cells}</div>`;
 }
+
 /* Строка задачи: таймеры и fp-eligible только если установлен виджет «Фокус» */
 function rightRowHTML(tk, t) {
   const struck = isDone(tk);
@@ -566,15 +584,16 @@ function rightRowHTML(tk, t) {
   const sub = (hasSub && expandedSub === tk.id) ? subPanelHTML(tk) : '';
   const elig = hasWidget('focus') && Object.values(tk.days || {}).some(s => s === 'todo' || s === 'started');
   return `<div class="r-row m-${tk.mode}${struck ? ' st-done' : ''}${run}${elig ? ' fp-eligible' : ''}" data-id="${esc(tk.id)}">
-    <button type="button" class="swipe-hint hint-done">✓ Выполнено</button>
-    <button type="button" class="swipe-hint hint-move">Перенос на завтра →</button>
-    ${indHTML(tk)}
-    <span class="g-title">${esc(tk.title)}</span>
-    <span class="g-meta">${metaHTML(tk)}</span>
-    <span class="g-sp"></span>
-    ${sub}
-  </div>`;
+<button type="button" class="swipe-hint hint-done">✓ Выполнено</button>
+<button type="button" class="swipe-hint hint-move">Перенос на завтра →</button>
+${indHTML(tk)}
+<span class="g-title">${esc(tk.title)}</span>
+<span class="g-meta">${metaHTML(tk)}</span>
+<span class="g-sp"></span>
+${sub}
+</div>`;
 }
+
 /* ── Подзадачи: делегирование кликов (не ломается при перерисовке) ── */
 let subDelegated = false;
 function bindSub() {
@@ -640,6 +659,7 @@ function startSubEdit(sp) {
   inp.onblur = () => commit(true);
   inp.onclick = ev => ev.stopPropagation();
 }
+
 function renderGrid() {
   const t = today();
   const rows = weekRows(state.weekStart);
@@ -648,24 +668,24 @@ function renderGrid() {
   const mobileRows = rows.map(r => `<div class="m-task${expandedSq === r.id ? ' sq-open' : ''}">${rightRowHTML(r, t)}${hideSquares ? '' : leftRowHTML(r, t)}</div>`).join('');
   const empty = `<p class="empty">Пусто — добавьте задачу (кнопка «＋» или клавиша ${hk.pretty(hk.keyFor('new'))})</p>`;
   $('grid').innerHTML = `<section class="pane p-left glass">
-    <div class="l-head">${headHTML(t)}</div>
-    <div class="l-body">
-      <div class="inline-cal-container"><div class="inline-cal"></div></div>
-      <div class="sq-rows">${leftRows}</div>
-    </div>
-  </section>
-  <section class="pane p-right glass">
-    <div class="r-head"><span class="kb-board-title">Running-list</span><div class="r-nav"></div><div class="r-search"></div></div>
-    <div>${rightRows}</div>
-    ${rows.length ? '' : empty}
-  </section>
-  <section class="pane p-mobile glass">
-    <div class="m-head">${mobileHeadHTML(t)}</div>
-    <div class="l-body">
-      <div class="inline-cal-container"><div class="inline-cal"></div></div>
-      <div class="sq-rows">${mobileRows}</div>
-    </div>
-  </section>`;
+<div class="l-head">${headHTML(t)}</div>
+<div class="l-body">
+<div class="inline-cal-container"><div class="inline-cal"></div></div>
+<div class="sq-rows">${leftRows}</div>
+</div>
+</section>
+<section class="pane p-right glass">
+<div class="r-head"><span class="kb-board-title">Running-list</span><div class="r-nav"></div><div class="r-search"></div></div>
+<div>${rightRows}</div>
+${rows.length ? '' : empty}
+</section>
+<section class="pane p-mobile glass">
+<div class="m-head">${mobileHeadHTML(t)}</div>
+<div class="l-body">
+<div class="inline-cal-container"><div class="inline-cal"></div></div>
+<div class="sq-rows">${mobileRows}</div>
+</div>
+</section>`;
   $('grid').querySelectorAll('.g-hd').forEach(h => {
     h.onclick = () => openDay(h.dataset.day);
   });
@@ -713,8 +733,9 @@ function renderGrid() {
   bindPaneMoveHandle();
   syncRowHeights();
 }
+
 /* ── Мобилка: после раскладки app.js доводим шапку недели:
-   стрелки+неделя → .m-head-nav, троеточие → перед заголовком ── */
+стрелки+неделя → .m-head-nav, троеточие → перед заголовком ── */
 function adjustMobileHead() {
   const grid = $('grid');
   if (!grid || grid.hidden) return;
@@ -727,6 +748,7 @@ function adjustMobileHead() {
   if (title && vb && vb.nextSibling !== title) title.insertAdjacentElement('beforebegin', vb);
 }
 document.addEventListener('grid-rendered', () => setTimeout(adjustMobileHead, 0));
+
 /* ── Ресайз и смена брейкпоинта: доводим шапку сразу, без ожидания рендера ── */
 const mqMobileWeek = matchMedia('(max-width: 720px)');
 const rehead = () => setTimeout(adjustMobileHead, 0);
@@ -736,6 +758,7 @@ window.addEventListener('resize', () => {
   clearTimeout(_reheadT);
   _reheadT = setTimeout(adjustMobileHead, 60);
 });
+
 /* ── Мобилка: полоски вместо квадратов; тап по полоске раскрывает квадраты ── */
 const barsClosed = c => {
   const m = c.closest('.m-task');
@@ -750,6 +773,7 @@ function openSqBars(cell) {
   expandedSq = cell.dataset.id;
   m.classList.add('sq-open');
 }
+
 /* ── Мобилка: тап по ряду полосок (включая промежутки) раскрывает квадраты ── */
 let sqClickBound = false;
 function bindSqOpen() {
@@ -764,6 +788,7 @@ function bindSqOpen() {
     if (first) openSqBars(first);
   });
 }
+
 function bindCell(c) {
   const id = c.dataset.id;
   const day = c.dataset.day;
@@ -805,6 +830,7 @@ function bindCell(c) {
   });
   c.addEventListener('contextmenu', e => e.preventDefault());
 }
+
 /* ── Мобилка: любой скролл ленты плавно схлопывает квадраты в полоски ── */
 (function bindBarsCloseOnScroll() {
   const app = $('app');
@@ -815,6 +841,7 @@ function bindCell(c) {
     document.querySelectorAll('.m-task.sq-open').forEach(x => x.classList.remove('sq-open'));
   }, { passive: true });
 })();
+
 (function bindGridSwipe() {
   let sx = 0, sy = 0, active = false;
   const el = $('grid');
@@ -841,6 +868,7 @@ function bindCell(c) {
     }
   });
 })();
+
 let revealedRow = null;
 function collapseRevealed() {
   if (revealedRow) {
@@ -947,6 +975,7 @@ function bindRowGestures(row, acts) {
   });
   row.addEventListener('pointercancel', end);
 }
+
 export const dayOpen = () => {
   const el = document.getElementById('daySheet');
   return el && el.classList.contains('open');
@@ -966,6 +995,7 @@ export function closeDay() {
   }
   refreshBackdrop();
 }
+
 function dayTaskHTML(t, day) {
   const st = (t.days || {})[day] || 'todo';
   const pp = st === 'postponed' ? ((t.days || {})[addDays(day, 1)] === 'postponed' ? ' pp-dash' : ' pp-arrow') : '';
@@ -974,15 +1004,16 @@ function dayTaskHTML(t, day) {
   const sub = (hasSub && expandedSub === t.id) ? subPanelHTML(t) : '';
   const doneClass = isDone(t) ? ' task-done' : '';
   return `<li class="task m-${t.mode} st-${st}${run}${doneClass}" data-id="${esc(t.id)}">
-    <button type="button" class="status${pp}"></button>
-    ${indHTML(t)}
-    <div class="t-body">
-      <div class="t-title">${esc(t.title)}</div>
-      <div class="t-meta">${metaHTML(t) ? metaHTML(t) + ' · ' : ''}${TYPE_LABEL[t.type] || 'Задача'}${t.blockStart ? ` · ⏰ ${t.blockStart}–${blockEnd(t)}` : ''}</div>
-    </div>
-    ${sub}
-  </li>`;
+<button type="button" class="status${pp}"></button>
+${indHTML(t)}
+<div class="t-body">
+<div class="t-title">${esc(t.title)}</div>
+<div class="t-meta">${metaHTML(t) ? metaHTML(t) + ' · ' : ''}${TYPE_LABEL[t.type] || 'Задача'}${t.blockStart ? ` · ⏰ ${t.blockStart}–${blockEnd(t)}` : ''}</div>
+</div>
+${sub}
+</li>`;
 }
+
 export function renderDaySheet() {
   const day = state.day;
   const titleEl = $('daySheetTitle');
@@ -1055,6 +1086,7 @@ export function renderDaySheet() {
   const dayCloseBtn = document.getElementById('dayClose');
   if (dayCloseBtn) dayCloseBtn.onclick = closeDay;
 }
+
 /* ── Панель заметок: синхронно с сеткой ── */
 function renderNotesPanelSync() {
   const panel = document.getElementById('notesPanel');
@@ -1062,6 +1094,7 @@ function renderNotesPanelSync() {
   setWeekStart(state.weekStart);
   renderNotesPanel(panel);
 }
+
 export function renderAll() {
   closeCellMenu();
   collapseRevealed();
@@ -1077,6 +1110,7 @@ export function renderAll() {
   if (dayOpen()) renderDaySheet();
   document.dispatchEvent(new CustomEvent('grid-rendered'));
 }
+
 /* ── Лёгкое обновление «бегущих» строк без перерендера (тик таймера) ── */
 export function refreshRunning() {
   const act = tm.getActive();
