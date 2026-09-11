@@ -4,8 +4,8 @@ import { uid, esc } from './store.js';
 const STORE = 'contacts';
 const state = { people: [] };
 const listeners = [];
-
 export const contactsSubscribe = fn => listeners.push(fn);
+
 let pending = false;
 const notify = () => {
   if (pending) return;
@@ -104,6 +104,7 @@ export async function removeAssignment(personId, aid) {
 }
 
 const modeLabel = m => ({ work: 'Работа', home: 'Дом', study: 'Учёба', all: 'Все' }[m] || m);
+
 function modeColor(m) {
   const cs = getComputedStyle(document.documentElement);
   return ({
@@ -118,7 +119,11 @@ export function renderContactsView(container, mode) {
   if (!container) return;
   const people = getPeople(mode);
   if (!people.length) {
-    container.innerHTML = '<div class="contacts-empty"><p>Пока никого нет в режиме «' + modeLabel(mode) + '».</p><div class="contacts-add-row"><input id="newPersonName" name="newPersonName" class="f-title" placeholder="Имя человека" maxlength="100"><button type="button" class="btn primary" id="addPersonBtn">Добавить</button></div></div>';
+    container.innerHTML = '<div class="contacts-empty"><p>Пока никого нет в режиме «' + modeLabel(mode) + '».</p>' +
+      '<div class="contacts-add-row">' +
+      '<input id="newPersonName" name="newPersonName" class="f-title" placeholder="Имя человека" maxlength="100">' +
+      '<button type="button" class="btn primary" id="addPersonBtn">Добавить</button>' +
+      '</div></div>';
     const inp = container.querySelector('#newPersonName'), btn = container.querySelector('#addPersonBtn');
     const doAdd = async () => {
       const v = inp.value.trim();
@@ -130,25 +135,47 @@ export function renderContactsView(container, mode) {
     inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); doAdd(); } };
     return;
   }
-  let html = '<div class="contacts-add-row"><input id="newPersonName" name="newPersonName" class="f-title" placeholder="＋ новый человек" maxlength="100"><button type="button" class="btn primary" id="addPersonBtn">Добавить</button></div>';
+  let html = '<div class="contacts-add-row">' +
+    '<input id="newPersonName" name="newPersonName" class="f-title" placeholder="＋ новый человек" maxlength="100">' +
+    '<button type="button" class="btn primary" id="addPersonBtn">Добавить</button>' +
+    '</div>';
   for (const p of people) {
     const active = p.assignments.filter(a => a.status !== 'done').length;
     const done = p.assignments.filter(a => a.status === 'done').length;
-    html += '<section class="contact-card glass" data-id="' + p.id + '"><div class="contact-head"><div class="contact-avatar" style="background:' + modeColor(p.mode) + '">' + esc(p.name.charAt(0).toUpperCase()) + '</div><div class="contact-info"><div class="contact-name">' + esc(p.name) + '</div><div class="contact-meta">' + active + ' активно · ' + done + ' выполнено</div>';
+    html += '<section class="contact-card glass" data-id="' + p.id + '">' +
+      '<div class="contact-head">' +
+      '<div class="contact-avatar" style="background:' + modeColor(p.mode) + '">' + esc(p.name.charAt(0).toUpperCase()) + '</div>' +
+      '<div class="contact-info">' +
+      '<div class="contact-name">' + esc(p.name) + '</div>' +
+      '<div class="contact-meta">' + active + ' активно · ' + done + ' выполнено</div>';
     if (p.phone) html += '<div class="contact-sub">📞 ' + esc(p.phone) + '</div>';
     if (p.email) html += '<div class="contact-sub">✉ ' + esc(p.email) + '</div>';
     if (p.birthday) html += '<div class="contact-sub">🎂 ' + esc(p.birthday) + '</div>';
-    html += '</div><button type="button" class="icon-btn contact-edit" title="Редактировать">✎</button><button type="button" class="icon-btn contact-del" title="Удалить">✕</button></div>';
+    html += '</div>' +
+      '<button type="button" class="icon-btn contact-edit" title="Редактировать">✎</button>' +
+      '<button type="button" class="icon-btn contact-del" title="Удалить">✕</button>' +
+      '</div>';
     if (p.note) html += '<div class="contact-note">' + esc(p.note) + '</div>';
     html += '<div class="contact-assignments">';
     for (const a of p.assignments) {
-      html += '<div class="assignment-row' + (a.status === 'done' ? ' a-done' : '') + '" data-aid="' + a.id + '"><button type="button" class="a-status a-' + a.status + '" title="Статус"></button><div class="a-body"><div class="a-title' + (a.status === 'done' ? ' a-done' : '') + '">' + esc(a.title) + '</div>';
+      html += '<div class="assignment-row' + (a.status === 'done' ? ' a-done' : '') + '" data-aid="' + a.id + '">' +
+        '<button type="button" class="a-status a-' + a.status + '" title="Статус"></button>' +
+        '<div class="a-body">' +
+        '<div class="a-title' + (a.status === 'done' ? ' a-done' : '') + '">' + esc(a.title) + '</div>';
       if (a.note) html += '<div class="a-note">' + esc(a.note) + '</div>';
-      html += '</div><button type="button" class="a-edit" title="Редактировать">✎</button><button type="button" class="a-del" title="Удалить">✕</button></div>';
+      html += '</div>' +
+        '<button type="button" class="a-edit" title="Редактировать">✎</button>' +
+        '<button type="button" class="a-del" title="Удалить">✕</button>' +
+        '</div>';
     }
-    html += '</div><div class="assignment-add"><input name="newAssTitle" class="f-title new-ass-title" placeholder="＋ новое поручение" maxlength="200"><button type="button" class="btn primary new-ass-btn">Добавить</button></div></section>';
+    html += '</div>' +
+      '<div class="assignment-add">' +
+      '<input name="newAssTitle" class="f-title new-ass-title" placeholder="＋ новое поручение" maxlength="200">' +
+      '<button type="button" class="btn primary new-ass-btn">Добавить</button>' +
+      '</div></section>';
   }
   container.innerHTML = html;
+
   const addInp = container.querySelector('#newPersonName'), addBtn = container.querySelector('#addPersonBtn');
   const doAdd = async () => {
     const v = addInp.value.trim();
@@ -158,6 +185,7 @@ export function renderContactsView(container, mode) {
   };
   addBtn.onclick = doAdd;
   addInp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); doAdd(); } };
+
   container.querySelectorAll('.contact-card').forEach(card => {
     const pid = card.dataset.id;
     card.querySelector('.contact-edit').onclick = () => openPersonEditor(pid, mode);
@@ -211,8 +239,31 @@ export function openPersonEditor(personId, mode) {
   editorOpen = true;
   const overlay = document.createElement('div');
   overlay.className = 'person-editor-backdrop';
-  overlay.innerHTML = '<div class="person-editor glass"><header class="ed-head"><span class="ed-title">Человек</span><span class="spacer"></span><button type="button" class="icon-btn pe-cancel" title="Закрыть">✕</button></header><div class="ed-scroll"><textarea name="peName" class="f-title pe-name" rows="1" maxlength="100" placeholder="Имя">' + esc(p.name) + '</textarea><section class="ed-card"><h4>Режим</h4><div class="chip-row pe-mode">' + ['work', 'home', 'study', 'all'].map(m => '<button type="button" class="chip' + (p.mode === m ? ' on' : '') + '" data-mode="' + m + '">' + modeLabel(m) + '</button>').join('') + '</div></section><section class="ed-card"><h4>Контакты</h4><input name="pePhone" class="f-title pe-phone" placeholder="Телефон" value="' + esc(p.phone || '') + '"><input name="peEmail" class="f-title pe-email" placeholder="Email" value="' + esc(p.email || '') + '"><input name="peBirthday" class="f-title pe-birthday" type="date" value="' + (p.birthday || '') + '"></section><section class="ed-card"><h4>Заметка</h4><textarea name="peNote" class="f-title pe-note" rows="2" placeholder="Заметка о человеке...">' + esc(p.note || '') + '</textarea></section></div><div class="ed-actions"><button type="button" class="btn danger pe-delete">Удалить</button><span class="spacer"></span><button type="button" class="btn pe-cancel2">✕</button><button type="button" class="btn primary pe-save">✓</button></div></div>';
+  overlay.innerHTML = '<div class="person-editor glass">' +
+    '<header class="ed-head"><span class="ed-title">Человек</span><span class="spacer"></span>' +
+    '<button type="button" class="icon-btn pe-cancel" title="Закрыть">✕</button></header>' +
+    '<div class="ed-scroll">' +
+    '<textarea name="peName" class="f-title pe-name" rows="1" maxlength="100" placeholder="Имя">' + esc(p.name) + '</textarea>' +
+    '<section class="ed-card"><h4>Режим</h4><div class="chip-row pe-mode">' +
+    ['work', 'home', 'study', 'all'].map(m => '<button type="button" class="chip' + (p.mode === m ? ' on' : '') + '" data-mode="' + m + '">' + modeLabel(m) + '</button>').join('') +
+    '</div></section>' +
+    '<section class="ed-card"><h4>Контакты</h4>' +
+    '<input name="pePhone" class="f-title pe-phone" placeholder="Телефон" value="' + esc(p.phone || '') + '">' +
+    '<input name="peEmail" class="f-title pe-email" placeholder="Email" value="' + esc(p.email || '') + '">' +
+    '<input name="peBirthday" class="f-title pe-birthday" type="date" value="' + (p.birthday || '') + '">' +
+    '</section>' +
+    '<section class="ed-card"><h4>Заметка</h4>' +
+    '<textarea name="peNote" class="f-title pe-note" rows="2" placeholder="Заметка о человеке...">' + esc(p.note || '') + '</textarea>' +
+    '</section>' +
+    '</div>' +
+    '<div class="ed-actions">' +
+    '<button type="button" class="btn danger pe-delete">Удалить</button>' +
+    '<span class="spacer"></span>' +
+    '<button type="button" class="btn pe-cancel2">✕</button>' +
+    '<button type="button" class="btn primary pe-save">✓</button>' +
+    '</div></div>';
   document.body.appendChild(overlay);
+
   const nameEl = overlay.querySelector('.pe-name');
   nameEl.style.height = 'auto';
   nameEl.style.height = nameEl.scrollHeight + 'px';
@@ -260,23 +311,28 @@ export const getContactsForSync = () => state.people;
 // ── Tombstones для контактов ──
 const CONTACT_TOMBSTONES_KEY = 'rl_contact_tombstones';
 let contactTombstones = [];
+
 function loadContactTombstones() {
   try {
     const raw = localStorage.getItem(CONTACT_TOMBSTONES_KEY);
     contactTombstones = raw ? JSON.parse(raw) : [];
   } catch { contactTombstones = []; }
 }
+
 function saveContactTombstones() {
   try { localStorage.setItem(CONTACT_TOMBSTONES_KEY, JSON.stringify(contactTombstones)); } catch {}
 }
+
 export function getContactTombstones() {
   return contactTombstones.slice();
 }
+
 export function addContactTombstone(id) {
   if (!id || contactTombstones.some(t => t.id === id)) return;
   contactTombstones.push({ id, deletedAt: Date.now() });
   saveContactTombstones();
 }
+
 export async function applyContactTombstones(server) {
   const arr = Array.isArray(server) ? server : [];
   const map = new Map();
