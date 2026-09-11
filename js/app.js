@@ -149,6 +149,7 @@ function openTagColorMenu(anchor, t) {
     document.addEventListener('pointerdown', close);
   }, 0);
 }
+
 async function setBg(c) { storedBg = c; await dbSetKV('bg', c); applyTheme(); renderLookPanel(); }
 async function setFont(id) {
   if (!FONTS.some(f => f.id === id)) return;
@@ -182,8 +183,9 @@ async function setBgOpacity(val) {
   const label = $('bgOpacityLabel');
   if (label) label.textContent = Math.round(storedBgOpacity * 100) + '%';
 }
+
 /* ── Панель оформления: не перестраиваем скрытую, защита от повторного входа,
-   кружки тем красим шорткатом background (цвет И градиент), обои — слоем сверху ── */
+кружки тем красим шорткатом background (цвет И градиент), обои — слоем сверху ── */
 let _lookBusy = false;
 function renderLookPanel() {
   const dt = $('drawerTheme');
@@ -396,6 +398,7 @@ function renderLookPanel() {
     _lookBusy = false;
   }
 }
+
 function renderTagsPanel() {
   const dict = getTagsDict();
   const box = $('tagsList');
@@ -429,7 +432,7 @@ function renderTagsPanel() {
     ren.onclick = () => {
       const inp = document.createElement('input');
       inp.className = 'tag-rename';
-      inp.id = 'tagRename_' + Math.random().toString(36).slice(2, 8);
+      inp.id = 'tagRename' + Math.random().toString(36).slice(2, 8);
       inp.name = 'tagRename';
       inp.autocomplete = 'off';
       inp.value = t.name;
@@ -458,7 +461,9 @@ function renderTagsPanel() {
     box.appendChild(row);
   }
 }
+
 const drawerOpen = () => { const d = $('drawer'); return d && d.classList.contains('open'); };
+
 function setupDrawerGrip() {
   const drawer = $('drawer');
   const drawerMain = $('drawerMain');
@@ -500,6 +505,7 @@ function setupDrawerGrip() {
   grip.addEventListener('pointerup', finish);
   grip.addEventListener('pointercancel', finish);
 }
+
 function showDrawerView(v) {
   const dm = $('drawerMain');
   const ds = $('drawerSync');
@@ -539,6 +545,7 @@ function closeDrawer() {
     if (dx > 60 && Math.abs(dy) < 60) closeDrawer();
   });
 })();
+
 function setView(v) {
   if (v === 'contacts' && kanbanOpen()) kanbanForceClose(); // канбан живёт только в неделе
   state.view = v;
@@ -561,6 +568,7 @@ function setView(v) {
   else renderAll();
   placeWeekNav();
 }
+
 function renderCurrent() {
   if (state.view === 'week') {
     renderAll();
@@ -570,8 +578,7 @@ function renderCurrent() {
     if (notesPanel) notesPanel.hidden = false;
     if (focusPanel) focusPanel.hidden = false;
     if (kanbanOpen()) renderKanban(); // доска обновляется вместе с сеткой
-  }
-  else if (state.view === 'contacts') {
+  } else if (state.view === 'contacts') {
     const cv = $('contactsView');
     // Скрываем панели в режиме контактов
     const notesPanel = $('notesPanel');
@@ -581,6 +588,7 @@ function renderCurrent() {
     if (cv) renderContactsView(cv, state.mode);
   }
 }
+
 (function bindPull() {
   const app = $('app');
   const ind = $('pullIndicator');
@@ -619,6 +627,7 @@ function renderCurrent() {
   app.addEventListener('pointerup', finish);
   app.addEventListener('pointercancel', finish);
 })();
+
 async function boot() {
   await init();
   await contactsInit();
@@ -674,7 +683,9 @@ async function boot() {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 }
+
 function moveDay(dir) { openDay(addDays(dayOpen() ? state.day : today(), dir)); }
+
 function bindNav() {
   const prevWeek = $('prevWeek');
   const nextWeek = $('nextWeek');
@@ -751,6 +762,7 @@ function bindNav() {
     b.onclick = () => setView(b.dataset.view);
   });
 }
+
 function bindNavHide() {
   const app = $('app');
   const nav = $('bottomNav');
@@ -762,8 +774,9 @@ function bindNavHide() {
     t = setTimeout(() => nav.classList.remove('hid'), 180);
   }, { passive: true });
 }
+
 /* ── ПК: блок недели и поиск в шапке задач; мобилка — топбар.
-   Троеточие меню — ПЕРЕД заголовком панели (14px до заголовка). ── */
+Троеточие меню — ПЕРЕД заголовком панели (14px до заголовка). ── */
 const mqMobile = matchMedia('(max-width: 720px)');
 let navHost = null, searchHost = null, searchAnchor = null;
 let navNodes = null;
@@ -779,10 +792,10 @@ function getNavNodes() {
   return navNodes;
 }
 /* Троеточие-меню: ПК-неделя — перед «Running-list», ПК-канбан — перед
-   «Kanban-доска», мобилка-неделя — перед заголовком липкой шапки (ставит
-   week.js), мобилка-канбан — перед заголовком доски (ставит kanban.js).
-   Если целевой заголовок ещё не построен — НЕ утаскиваем кнопку в топбар:
-   её доставит ближайший grid-rendered / renderKanban / adjustMobileHead. */
+«Kanban-доска», мобилка-неделя — перед заголовком липкой шапки (ставит
+week.js), мобилка-канбан — перед заголовком доски (ставит kanban.js).
+Если целевой заголовок ещё не построен — НЕ утаскиваем кнопку в топбар:
+её доставит ближайший grid-rendered / renderKanban / adjustMobileHead. */
 function placeViewBtn() {
   const vb = $('viewBtn');
   if (!vb) return;
@@ -840,6 +853,7 @@ function placeWeekNav() {
   }
   placeViewBtn();
 }
+
 function bindKeys() {
   document.addEventListener('keydown', e => {
     const typing = /^(INPUT|TEXTAREA)$/.test(e.target.tagName) || e.target.isContentEditable;
@@ -861,6 +875,7 @@ function bindKeys() {
     else if (hk.matches(e, 'kanban')) { e.preventDefault(); toggleKanbanView(); }
   });
 }
+
 function bindSync() {
   const btn = $('syncBtn');
   if (btn) btn.onclick = () => openDrawer('sync');
@@ -868,4 +883,5 @@ function bindSync() {
     if (btn) btn.dataset.state = e.detail;
   });
 }
+
 boot();
