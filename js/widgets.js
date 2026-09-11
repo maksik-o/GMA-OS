@@ -201,9 +201,7 @@ function applyDrop(rowEl, x, me, grabDX) {
   applyDockLayout();
 }
 
-/* ── Средний блок между доками: сетка недели, а если она скрыта —
-   панель канбана. Без этого скрытый #grid давал нулевой rect и
-   все броски уходили вниз. ── */
+/* ── Средний блок между доками: сетка недели, а если она скрыта — панель канбана ── */
 function midBlock() {
   const g = $('grid');
   if (g && !g.hidden && g.offsetHeight) return g;
@@ -271,7 +269,55 @@ function flipInstall(snaps) {
   });
 }
 
-/* ── Единая сессия переноса (из сетки и из меню) ── */
+/* ── Перенос: лента залочена, панель привязана к пальцу (fixed),
+   у краёв экрана — автоскролл ленты, панель при этом не улетает ── */
+function lockScroll(ctx) {
+  const appEl = $('app');
+  if (appEl && ctx.appOverflow === null) {
+    ctx.appOverflow = appEl.style.overflow;
+    appEl.style.overflow = 'hidden'; // палец ленту не скроллит
+  }
+}
+function unlockScroll(ctx) {
+  const appEl = $('app');
+  if (appEl && ctx.appOverflow !== null) {
+    appEl.style.overflow = ctx.appOverflow;
+    ctx.appOverflow = null;
+  }
+}
+function autoScroll(y) {
+  const appEl = $('app');
+  if (!appEl) return;
+  if (y < 80) appEl.scrollTop -= 14;             // к верху экрана — лента вниз
+  else if (y > innerHeight - 80) appEl.scrollTop += 14; // к низу экрана — лента вверх
+}
+function toFixed(ctx, x, y) {
+  const p = ctx.panel;
+  if (ctx.fixed) return;
+  const pr = p.getBoundingClientRect();
+  ctx.fixed = true;
+  p.style.width = pr.width + 'px';
+  p.style.height = pr.height + 'px';
+  p.style.position = 'fixed';
+  p.style.zIndex = '60';
+  p.style.margin = '0';
+  p.style.left = (x - ctx.grabDX) + 'px';
+  p.style.top = (y - ctx.grabDY) + 'px';
+  document.body.appendChild(p);
+}
+function fromFixed(ctx) {
+  const p = ctx.panel;
+  if (!ctx.fixed) return;
+  ctx.fixed = false;
+  p.style.position = '';
+  p.style.zIndex = '';
+  p.style.left = '';
+  p.style.top = '';
+  p.style.width = '';
+  p.style.height = '';
+  p.style.margin = '';
+}
+
 function startSession(which, panel, ev, mode) {
   const sx = ev.clientX, sy = ev.clientY;
   let grabDX, grabDY;
@@ -282,7 +328,11 @@ function startSession(which, panel, ev, mode) {
   } else {
     grabDX = 16; grabDY = 16; // ручка панели (её центр ~16,16)
   }
-  const ctx = { which, panel, mode, sx, sy, grabDX, grabDY, started: false, overBtn: false, hoverRow: null };
+  const ctx = {
+    which, panel, mode, sx, sy, grabDX, grabDY,
+    started: false, overBtn: false, hoverRow: null,
+    fixed: false, appOverflow: null,
+  };
   const move = e => moveDrag(e, ctx);
   const up = e => {
     document.removeEventListener('pointermove', move);
@@ -294,6 +344,7 @@ function startSession(which, panel, ev, mode) {
   document.addEventListener('pointerup', up);
   document.addEventListener('pointercancel', up);
 }
+
 function moveDrag(ev, ctx) {
   const x = ev.clientX, y = ev.clientY;
   const dx = x - ctx.sx, dy = y - ctx.sy;
@@ -303,30 +354,23 @@ function moveDrag(ev, ctx) {
       ctx.started = true;
       document.body.classList.add('dock-drag');
       ctx.panel.classList.add('dock-dragging');
-      if (ctx.mode === 'menu') {
-        hideMini();
-        const p = ctx.panel;
-        document.body.appendChild(p); // из хранилища
-        p.style.position = 'fixed';
-        p.style.zIndex = '60';
-        if (ctx.which === 'notes') p.style.width = '340px';
-        p.style.left = (x - ctx.grabDX) + 'px';
-        p.style.top = (y - ctx.grabDY) + 'px';
-        /* трансформация из пилюли в нормальный блок */
-        p.animate([{ transform: 'scale(.6)', opacity: .4 }, { transform: 'scale(1)', opacity: 1 }],
-          { duration: 260, easing: 'cubic-bezier(.32, 1.18, .28, 1)' });
-      }
+      hideMini();
+      lockScroll(ctx);
+      toFixed(ctx, x, y);
+      ctx.panel.animate(
+        [{ transform: 'scale(.94)', opacity: .6 }, { transform: 'scale(1)', opacity: 1 }],
+        { duration: 220, easing: 'cubic-bezier(.32, 1.18, .28, 1)' }
+      );
     }
   }
   if (!ctx.started) {
     if (ctx.mode === 'menu') showMini(ctx.which, x, y);
     return;
   }
-  if (ctx.mode === 'dock') ctx.panel.style.transform = `translate(${dx}px, ${dy}px)`;
-  else {
-    ctx.panel.style.left = (x - ctx.grabDX) + 'px';
-    ctx.panel.style.top = (y - ctx.grabDY) + 'px';
-  }
+  /* панель привязана к пальцу: только координаты, без transform */
+  ctx.panel.style.left = (x - ctx.grabDX) + 'px';
+  ctx.panel.style.top = (y - ctx.grabDY) + 'px';
+  autoScroll(y);
   /* зона «в хранилище» */
   const z = unplaceZoneRect();
   const over = !!z && inRect(x, y, z);
@@ -347,9 +391,8 @@ function moveDrag(ev, ctx) {
   if (over) { showMini(ctx.which, x, y); return; }
   /* ряд вставки + сдвиги между блоками */
   ctx.hoverRow = dockRowAt(x, y);
-  /* Сдвиг ВНИЗ (освободить верх) — как раньше, всегда.
-     Сдвиг ВВЕРХ — только если вверху есть блоки;
-     если вверху пусто, панели недели/задач вверх не едут. */
+  /* Сдвиг ВНИЗ (освободить верх) — всегда.
+     Сдвиг ВВЕРХ — только если вверху есть блоки. */
   const mid = midBlock();
   if (mid) {
     const gr = mid.getBoundingClientRect();
@@ -371,6 +414,7 @@ function moveDrag(ev, ctx) {
   if (ctx.hoverRow) updateYields(ctx.hoverRow, x, ctx.panel);
   else clearYields();
 }
+
 function finishDrag(ev, ctx) {
   document.body.classList.remove('dock-drag');
   const b = $('widgetsBtn');
@@ -380,15 +424,8 @@ function finishDrag(ev, ctx) {
   clearMidYields();
   const visRect = ctx.panel.getBoundingClientRect(); // где отпустили
   ctx.panel.classList.remove('dock-dragging');
-  ctx.panel.style.transform = '';
-  ctx.panel.style.visibility = '';
-  if (ctx.mode === 'menu') {
-    ctx.panel.style.position = '';
-    ctx.panel.style.zIndex = '';
-    ctx.panel.style.left = '';
-    ctx.panel.style.top = '';
-    ctx.panel.style.width = '';
-  }
+  fromFixed(ctx);
+  unlockScroll(ctx);
   if (!ctx.started) {
     if (ctx.mode === 'menu') ensureStorage().appendChild(ctx.panel);
     return;
@@ -399,8 +436,10 @@ function finishDrag(ev, ctx) {
     return;
   }
   if (!ctx.hoverRow) {
-    if (ctx.mode === 'menu') ensureStorage().appendChild(ctx.panel);
-    return; // отпустил вне рядов — блок возвращается
+    // отпустил вне рядов — панель возвращается на своё место
+    if (ctx.mode === 'dock') applyDockLayout();
+    else ensureStorage().appendChild(ctx.panel);
+    return;
   }
   if (ctx.mode === 'menu' && !isPlaced(ctx.which)) {
     state.widgets = Array.isArray(state.widgets) ? state.widgets : [];
@@ -496,10 +535,19 @@ export function renderWidgetsPanel() {
 export function openWidgetsPanel(btn) {
   renderWidgetsPanel();
   const p = _panel, r = btn.getBoundingClientRect();
-  p.style.top = (r.bottom + 8) + 'px';
-  p.style.right = Math.max(8, innerWidth - r.right - 44) + 'px';
   p.style.left = 'auto';
+  p.style.right = Math.max(8, innerWidth - r.right - 44) + 'px';
+  p.style.top = (r.bottom + 8) + 'px';
   p.classList.add('open');
+  /* кламп: панель целиком в экране, половина не уезжает */
+  requestAnimationFrame(() => {
+    const h = p.offsetHeight, w = p.offsetWidth;
+    let top = r.bottom + 8;
+    if (top + h > innerHeight - 8) top = Math.max(8, innerHeight - h - 8);
+    p.style.top = top + 'px';
+    const right = parseFloat(p.style.right) || 8;
+    if (innerWidth - right - w < 8) p.style.right = Math.max(8, innerWidth - w - 8) + 'px';
+  });
   setTimeout(() => {
     const close = e => {
       if (!p.contains(e.target) && !btn.contains(e.target)) { closeWidgetsPanel(); document.removeEventListener('pointerdown', close); }
