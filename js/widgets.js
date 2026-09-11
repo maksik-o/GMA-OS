@@ -6,11 +6,13 @@ const $ = id => document.getElementById(id);
 const WIDGETS_KEY = 'rl_widgets_v1';
 const DOCK_KEY = 'rl_dock_v1';
 const HANDLE = id => `<svg class="dock-handle" data-dock="${id}" viewBox="0 0 32 32" aria-hidden="true"><path d="M2 22 A20 20 0 0 1 12 4.68" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`;
+
 export const WIDGETS = [
   { id: 'notes', label: 'Заметки', icon: '📝' },
   { id: 'focus', label: 'Фокусировка', icon: '🎯' },
   { id: 'calendar', label: 'Календарь', icon: '📅' },
 ];
+
 /* Правила расстановки:
    SNAP_EDGE = 50px — магнит к краю страницы и к сторонам блоков;
    YIELD_DIST = 30px — сдвиги-«уступания» включаются заранее;
@@ -18,23 +20,27 @@ export const WIDGETS = [
 const SNAP_EDGE = 50;
 const YIELD_DIST = 30;
 const INSTALL_MS = 430;
+
 let dockState = {
   notes: { row: 'bottom', align: 'stretch', order: 0 },
   focus: { row: 'bottom', align: 'right', order: 1 },
   calendar: { row: 'top', align: 'left', order: 0 },
 };
 let _storage = null, _panel = null, _calDrum = null, _mini = null;
+
 export const isPlaced = id => (state.widgets || []).includes(id);
 const saveWidgets = () => { try { localStorage.setItem(WIDGETS_KEY, JSON.stringify(state.widgets)); } catch (e) {} };
 const saveDock = () => { try { localStorage.setItem(DOCK_KEY, JSON.stringify(dockState)); } catch (e) {} };
 const idOf = el => el.id === 'notesPanel' ? 'notes' : el.id === 'focusPanel' ? 'focus' : el.id === 'calPanel' ? 'calendar' : null;
 const panelEl = id => id === 'calendar' ? ensureCalPanel() : $(id === 'notes' ? 'notesPanel' : 'focusPanel');
+
 /* Заметки ВСЕГДА растянуты на всю доступную длину: сохранённый align игнорируем */
 const alignOf = k => {
   const id = idOf(k);
   if (id === 'notes') return 'stretch';
   return (dockState[id] || {}).align || 'left';
 };
+
 function ensureStorage() {
   if (_storage) return _storage;
   _storage = document.createElement('div');
@@ -43,6 +49,7 @@ function ensureStorage() {
   document.body.appendChild(_storage);
   return _storage;
 }
+
 /* ── Реальные кромки блока (без учёта сдвига-уступания) ── */
 function baseRect(k) {
   const r = k.getBoundingClientRect();
@@ -53,6 +60,7 @@ function baseRect(k) {
 }
 const rowPanels = (rowEl, exclude) =>
   [...rowEl.children].filter(k => k.classList.contains('dock-panel') && k !== exclude);
+
 /* ── Куда целится перетаскиваемый блок ── */
 function computeDrop(rowEl, x, me) {
   const kids = rowPanels(rowEl, me);
@@ -70,6 +78,7 @@ function computeDrop(rowEl, x, me) {
   if (best) return best;
   return { type: 'free', x: x - vr.left };
 }
+
 /* ── Сдвиги-«уступания» между блоками ряда ── */
 function clearYields() {
   document.querySelectorAll('.yield-left, .yield-right').forEach(el => el.classList.remove('yield-left', 'yield-right'));
@@ -92,6 +101,7 @@ function updateYields(rowEl, x, me) {
     }
   }
 }
+
 /* ── Раскладка дока: группы по align, заметки тянутся ── */
 function applyDockLayout() {
   const top = $('dockTop'), bottom = $('dockBottom');
@@ -142,8 +152,8 @@ function applyDockLayout() {
     }
     rowEl.dataset.mode = kids.length ? 'shared' : 'empty';
   }
-  renderCalWidget();
 }
+
 /* ── Бросок: ряд + место по магнитам, свободное место — по ручке ── */
 function applyDrop(rowEl, x, me, grabDX) {
   const kids = rowPanels(rowEl, me);
@@ -190,6 +200,7 @@ function applyDrop(rowEl, x, me, grabDX) {
   saveDock();
   applyDockLayout();
 }
+
 /* ── Средний блок между доками: сетка недели, а если она скрыта —
    панель канбана. Без этого скрытый #grid давал нулевой rect и
    все броски уходили вниз. ── */
@@ -213,6 +224,7 @@ function dockRowAt(x, y) {
   if (y > r.bottom + 8) return $('dockBottom');
   return null;
 }
+
 /* ── Мини-пилюля и зона «в хранилище» ── */
 const inRect = (x, y, r) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
 function unplaceZoneRect() {
@@ -239,6 +251,7 @@ function showMini(which, x, y) {
   m.style.top = y + 'px';
 }
 function hideMini() { if (_mini) _mini.style.display = 'none'; }
+
 /* ── FLIP: плавная установка + одновременный разъезд/сужение остальных ── */
 function flipInstall(snaps) {
   requestAnimationFrame(() => {
@@ -257,6 +270,7 @@ function flipInstall(snaps) {
     });
   });
 }
+
 /* ── Единая сессия переноса (из сетки и из меню) ── */
 function startSession(which, panel, ev, mode) {
   const sx = ev.clientX, sy = ev.clientY;
@@ -404,6 +418,7 @@ function finishDrag(ev, ctx) {
   renderWidgetsPanel();
   flipInstall(snaps);
 }
+
 /* ── Перенос панели из сетки за ручку ── */
 function bindDockDrag() {
   document.addEventListener('pointerdown', e => {
@@ -416,11 +431,13 @@ function bindDockDrag() {
     startSession(which, panel, e, 'dock');
   });
 }
+
 /* ── Перетаскивание из меню виджетов (удержание плитки) ── */
 function startPlacement(id, x, y) {
   showMini(id, x, y);
   startSession(id, panelEl(id), { clientX: x, clientY: y }, 'menu');
 }
+
 /* ── Виджет календаря: барабан, название месяца только в шапке ── */
 function ensureCalPanel() {
   let p = $('calPanel');
@@ -453,6 +470,7 @@ export function renderCalWidget() {
   if (t) t.textContent = calTitle(_calDrum.currentMonth());
   _calDrum.refresh();
 }
+
 /* ── Панель виджетов ── */
 function ensureWidgetsPanel() {
   if (_panel) return _panel;
@@ -490,6 +508,7 @@ export function openWidgetsPanel(btn) {
   }, 0);
 }
 export function closeWidgetsPanel() { if (_panel) _panel.classList.remove('open'); }
+
 function bindTileHold(tile, id) {
   let t = null, started = false, sx = 0, sy = 0;
   tile.addEventListener('pointerdown', e => {
@@ -509,6 +528,7 @@ function bindTileHold(tile, id) {
     if (t) { clearTimeout(t); t = null; }
   });
 }
+
 export function unplace(id) {
   state.widgets = (state.widgets || []).filter(w => w !== id);
   saveWidgets();
@@ -516,6 +536,7 @@ export function unplace(id) {
   renderAll();
   renderWidgetsPanel();
 }
+
 export function widgetsInit() {
   if (!Array.isArray(state.widgets)) state.widgets = ['notes', 'focus'];
   try {
@@ -528,6 +549,6 @@ export function widgetsInit() {
   applyDockLayout();
   bindDockDrag();
   /* Полоски у дней в виджете календаря обновляются СРАЗУ
-     при любом изменении задач — без тапа по шапке календаря */
+     при любом изменении задач — один триггер: grid-rendered */
   document.addEventListener('grid-rendered', renderCalWidget);
 }
