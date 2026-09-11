@@ -18,6 +18,7 @@ export const configured = () => API_URL.startsWith('https://') && CLIENT_ID.incl
 export const signedIn = () => !!(localStorage.getItem(TOKEN_KEY) || localStorage.getItem(KEY_KEY));
 
 function setStatus(s) { document.dispatchEvent(new CustomEvent('sync-status', { detail: s })); }
+
 export function refreshStatus() {
   const s = !navigator.onLine ? 'offline' : !configured() ? 'off' : signedIn() ? 'ok' : 'auth';
   setStatus(s);
@@ -152,10 +153,7 @@ export async function syncNow() {
     if (Array.isArray(out.tags)) await saveTagsMeta(out.tags, out.tagsDeleted || []);
     if (Array.isArray(out.contacts)) await applyContactsMerged(out.contacts);
     if (Array.isArray(out.contactTombstones)) await applyContactTombstones(out.contactTombstones);
-    if (Array.isArray(out.notes)) {
-      const { applyNotesMerged } = await import('./notes.js');
-      await applyNotesMerged(out.notes);
-    }
+    if (Array.isArray(out.notes)) await applyNotesMerged(out.notes);
     document.dispatchEvent(new CustomEvent('sync-done'));
     setStatus('ok');
   } catch (e) {
@@ -202,6 +200,7 @@ function loadIssuedKeys() {
   try { return JSON.parse(localStorage.getItem(ISSUED_KEYS_STORAGE) || '[]'); }
   catch { return []; }
 }
+
 function saveIssuedKeys(list) {
   try { localStorage.setItem(ISSUED_KEYS_STORAGE, JSON.stringify(list)); } catch {}
 }
@@ -217,16 +216,12 @@ function renderDeviceKeysPanel(el) {
     el.innerHTML = '';
     return;
   }
-  const list = loadIssuedKeys();
   el.innerHTML = `<div class="set-sub" style="margin-top:18px">Ключи устройства</div>
-    <p class="hint" style="margin:0 0 10px">
-      Ключ — это вход без Google. У каждого ключа своя изолированная папка в твоём Drive.
-      Сгенерируй, скопируй и передай кому нужно.
-    </p>
-    <div class="auth-row" style="justify-content:flex-start">
-      <button type="button" id="issueKeyBtn" class="btn primary">＋ Выдать ключ</button>
-    </div>
-    <div id="issuedKeysList" class="issued-keys-list"></div>`;
+<p class="hint" style="margin:0 0 10px">Ключ — это вход без Google. У каждого ключа своя изолированная папка в твоём Drive. Сгенерируй, скопируй и передай кому нужно.</p>
+<div class="auth-row" style="justify-content:flex-start">
+<button type="button" id="issueKeyBtn" class="btn primary">＋ Выдать ключ</button>
+</div>
+<div id="issuedKeysList" class="issued-keys-list"></div>`;
 
   const renderList = () => {
     const wrap = el.querySelector('#issuedKeysList');
@@ -237,14 +232,14 @@ function renderDeviceKeysPanel(el) {
     }
     wrap.innerHTML = current.map((item, i) =>
       `<div class="key-line" style="margin-top:8px">
-        <span class="kl" style="flex:1;min-width:0">
-          <div style="font-weight:700;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.label || 'Без имени'}</div>
-          <div style="font-size:11px;color:var(--dim);margin-top:2px">выдан ${new Date(item.issuedAt).toLocaleString('ru-RU')}</div>
-          <code style="font-size:11px;color:var(--accent);font-family:monospace;word-break:break-all;display:block;margin-top:4px">${item.key}</code>
-        </span>
-        <button type="button" class="btn mini" data-copy="${i}" title="Скопировать">⎘</button>
-        <button type="button" class="btn mini danger" data-del="${i}" title="Отозвать (удалить из списка)">✕</button>
-      </div>`
+<span class="kl" style="flex:1;min-width:0">
+<div style="font-weight:700;font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${item.label || 'Без имени'}</div>
+<div style="font-size:11px;color:var(--dim);margin-top:2px">выдан ${new Date(item.issuedAt).toLocaleString('ru-RU')}</div>
+<code style="font-size:11px;color:var(--accent);font-family:monospace;word-break:break-all;display:block;margin-top:4px">${item.key}</code>
+</span>
+<button type="button" class="btn mini" data-copy="${i}" title="Скопировать">⎘</button>
+<button type="button" class="btn mini danger" data-del="${i}" title="Отозвать (удалить из списка)">✕</button>
+</div>`
     ).join('');
     wrap.querySelectorAll('[data-copy]').forEach(b => {
       b.onclick = async () => {
@@ -281,7 +276,6 @@ function renderDeviceKeysPanel(el) {
     navigator.clipboard.writeText(key).catch(() => {});
     renderList();
   };
-
   renderList();
 }
 
@@ -326,7 +320,6 @@ export function renderSyncPanel(el) {
   if (nb) nb.onclick = async () => { await syncNow(); renderSyncPanel(el); };
   const ob = el.querySelector('#syncOut');
   if (ob) ob.onclick = async () => { await signOut(); renderSyncPanel(el); };
-
   // Панель генератора ключей — показывается только владельцу после входа
   renderDeviceKeysPanel(el.querySelector('#deviceKeysHost'));
 }
