@@ -10,7 +10,9 @@ input, textarea, [contenteditable="true"] { user-select: text; -webkit-user-sele
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 :root {
   --mode-work: #dc2626; --mode-home: #16a34a; --mode-study: #2563eb; --mode-all: #d4a017;
-  --c-todo: color-mix(in srgb, var(--text) 55%, transparent);
+  --c-todo: rgba(15, 23, 42, .55);
+  --dash-c: rgba(120, 130, 150, .55);
+  --rule-c: rgba(120, 130, 150, .35);
   --c-started: #f59e0b;
   --c-done: #10b981;
   --c-skipped: #f43f5e;
@@ -86,6 +88,9 @@ body[data-surf="light"] {
 body[data-surf="dark"] {
   --text:#f1f5f9;
   --dim:rgba(241,245,249,.55);
+  --c-todo: rgba(241, 245, 249, .55);
+  --dash-c: rgba(148, 163, 184, .5);
+  --rule-c: rgba(148, 163, 184, .3);
   --glass:rgba(30,41,59,var(--panel-a,.35));
   --card:rgba(51,65,85,calc(var(--panel-a,.35) + .03));
   --brd:rgba(148,163,184,.22);
@@ -1550,7 +1555,6 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  min-height: var(--focus-size);
   overflow: visible;
   min-width: 0;
   width: auto;
@@ -1580,10 +1584,19 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
 .note-title::placeholder { color: var(--dim); font-weight: 600; font-size: 13px; }
 .notes-editor {
   flex: 1;
-  min-height: 24px;
+  min-height: 72px;               /* ровно 3 строки по 24px */
   padding: 12px;
   border-radius: 12px;
-  background: var(--card);
+  background-color: transparent;  /* поле прозрачное */
+  /* пунктирный контур: крупный шаг 12px штрих / 8px пробел */
+  background-image:
+    repeating-linear-gradient(90deg, var(--dash-c) 0 12px, transparent 12px 20px),
+    repeating-linear-gradient(90deg, var(--dash-c) 0 12px, transparent 12px 20px),
+    repeating-linear-gradient(0deg, var(--dash-c) 0 12px, transparent 12px 20px),
+    repeating-linear-gradient(0deg, var(--dash-c) 0 12px, transparent 12px 20px);
+  background-position: left top, left bottom, left top, right top;
+  background-size: 100% 2px, 100% 2px, 2px 100%, 2px 100%;
+  background-repeat: no-repeat;
   font-size: 15px;
   line-height: 1.6;
   overflow-y: auto;
@@ -1591,6 +1604,18 @@ input.chip.time:focus { box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 4
   user-select: text;
   -webkit-user-select: text;
   cursor: text;
+}
+/* разлиновка ТОЛЬКО когда заметка пустая и поле не в фокусе */
+.notes-editor.is-empty:not(:focus) {
+  background-image:
+    repeating-linear-gradient(90deg, var(--dash-c) 0 12px, transparent 12px 20px),
+    repeating-linear-gradient(90deg, var(--dash-c) 0 12px, transparent 12px 20px),
+    repeating-linear-gradient(0deg, var(--dash-c) 0 12px, transparent 12px 20px),
+    repeating-linear-gradient(0deg, var(--dash-c) 0 12px, transparent 12px 20px),
+    repeating-linear-gradient(180deg, transparent 0 23px, var(--rule-c) 23px 24px);
+  background-position: left top, left bottom, left top, right top, 0 12px;
+  background-size: 100% 2px, 100% 2px, 2px 100%, 2px 100%, 100% 24px;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat-y;
 }
 .notes-editor:empty::before { content: none; }
 .notes-editor .nn-h { font-size: 17px; font-weight: 800; }
@@ -2334,8 +2359,7 @@ body, button, input, textarea, select,
   #ctBtn { display: none !important; }
   .dock { flex-direction: column; }
   .focus-panel { width: 100%; height: auto; aspect-ratio: 1; max-height: 440px; }
-  .notes-panel { min-height: 0; }
-}
+  }
 @media (max-width: 480px) { .g-meta { display: none; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
